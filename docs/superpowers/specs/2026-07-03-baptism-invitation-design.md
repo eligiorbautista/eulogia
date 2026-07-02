@@ -1,4 +1,4 @@
-# Baptism Invitation & RSVP App — Design Spec
+# Eulogia — Baptism Invitation & RSVP App — Design Spec
 
 ## 1. Overview
 

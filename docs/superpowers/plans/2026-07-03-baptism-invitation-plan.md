@@ -1,4 +1,4 @@
-# Baptism Invitation & RSVP App — Implementation Plan
+# Eulogia — Baptism Invitation & RSVP App — Implementation Plan
 
 > **For agentic workers:** Execute this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
