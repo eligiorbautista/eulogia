@@ -4,8 +4,20 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { guests, responses } from "@/db/schema";
 import { RsvpForm } from "@/components/invite/rsvp-form";
+import { FloatingShapes } from "@/components/invite/floating-shapes";
+import { ScrollReveal } from "@/components/invite/scroll-reveal";
+import { InviteSection } from "@/components/invite/invite-section";
+import {
+  RattleIcon,
+  BootiesIcon,
+  BottleIcon,
+  MoonIcon,
+  CloudIcon,
+  StarIcon,
+  BabyFeetIcon,
+} from "@/components/invite/baby-icons";
 import { Card, CardContent } from "@/components/ui/card";
-import { Calendar, MapPin, Shirt, Cross } from "lucide-react";
+import { Calendar, MapPin, Shirt, Cross, Heart } from "lucide-react";
 
 interface InvitePageProps {
   params: Promise<{ slug: string }>;
@@ -54,135 +66,207 @@ export default async function InvitePage({ params }: InvitePageProps) {
   });
 
   const childName = details?.childName ?? "our baby";
-  const gender = details?.gender ?? "boy";
+  const gender = (details?.gender ?? "boy") as "boy" | "girl";
 
   const whenText = [
     details?.baptismDate ? formatDate(details.baptismDate) : null,
     details?.baptismTime ? formatTime(details.baptismTime) : null,
-  ].filter(Boolean).join(" at ");
+  ]
+    .filter(Boolean)
+    .join(" at ");
 
   const eventItems = [
-    whenText ? { icon: Calendar, label: "When?", text: whenText } : null,
+    whenText
+      ? { icon: Calendar, label: "When", text: whenText }
+      : null,
     details?.venueName || details?.venueAddress
       ? {
           icon: MapPin,
-          label: "Where?",
+          label: "Where",
           text: details.venueName,
           subtext: details.venueAddress,
         }
       : null,
     details?.dressCode
-      ? { icon: Shirt, label: "What to Wear?", text: details.dressCode }
+      ? { icon: Shirt, label: "What to Wear", text: details.dressCode }
       : null,
   ].filter(Boolean);
 
-  return (
-    <div data-gender={gender} className="relative min-h-full overflow-hidden bg-gradient-to-b from-background via-secondary/30 to-background px-4 py-10 sm:py-16">
-      <div className="pointer-events-none absolute inset-0 opacity-40">
-        <div className="absolute left-1/2 top-0 h-64 w-64 -translate-x-1/2 rounded-full bg-primary/5 blur-3xl" />
-        <div className="absolute bottom-0 left-0 h-48 w-48 rounded-full bg-primary/5 blur-3xl" />
-        <div className="absolute bottom-10 right-0 h-48 w-48 rounded-full bg-primary/5 blur-3xl" />
-      </div>
+  const roleLabel =
+    guest.role === "godfather" ? "Godfather" : "Godmother";
 
-      <div className="relative mx-auto max-w-lg">
-        <Card className="animate-scale-in d-0 overflow-hidden border border-primary/10 shadow-xl">
-          <div className="bg-gradient-to-b from-primary/10 to-transparent px-6 pb-8 pt-10 text-center sm:px-10 sm:pb-10 sm:pt-12">
-            <div className="animate-fade-in-up d-1 mb-6 inline-flex items-center justify-center rounded-full bg-primary/10 px-4 py-2 text-primary">
-              <Cross className="mr-2 h-4 w-4" />
-              <span className="text-xs font-medium uppercase tracking-widest">
-                Baptismal Invitation
+  return (
+    <div
+      data-gender={gender}
+      className="relative min-h-full overflow-hidden bg-gradient-to-b from-background via-soft/60 to-background px-4 py-10 sm:py-16"
+    >
+      <FloatingShapes gender={gender} />
+
+      <div className="relative mx-auto max-w-xl sm:max-w-2xl lg:max-w-3xl">
+        <Card className="animate-scale-in-bounce overflow-hidden border border-primary/10 bg-card/90 shadow-2xl backdrop-blur-sm">
+          {/* Hero */}
+          <div className="relative bg-gradient-to-b from-primary/10 via-primary/5 to-transparent px-6 pb-10 pt-10 text-center sm:px-10 sm:pb-12 sm:pt-14">
+            {/* Decorative top elements */}
+            <div className="pointer-events-none absolute inset-x-0 top-4 flex justify-center gap-3 opacity-60">
+              <StarIcon className="h-4 w-4 text-primary/50 animate-twinkle" />
+              <MoonIcon className="h-5 w-5 text-primary/40 animate-bob" />
+              <span className="animate-twinkle" style={{ animationDelay: "0.5s" }}>
+                <StarIcon className="h-3 w-3 text-accent" />
               </span>
             </div>
 
-            <div className="animate-pop-in d-2 mx-auto mb-6 flex h-44 w-44 items-center justify-center rounded-full border-4 border-primary/20 bg-white p-2 shadow-lg sm:h-52 sm:w-52">
-              <div className="relative h-full w-full overflow-hidden rounded-full bg-white">
-                <Image
-                  src="/baby.png"
-                  alt={childName}
-                  fill
-                  className="object-cover"
-                  priority
-                />
+            <ScrollReveal delay={100}>
+              <div className="mb-6 inline-flex items-center justify-center rounded-full bg-primary/10 px-4 py-2 text-primary">
+                <Cross className="mr-2 h-4 w-4" />
+                <span className="text-xs font-semibold uppercase tracking-[0.2em]">
+                  Baptismal Invitation
+                </span>
               </div>
-            </div>
+            </ScrollReveal>
 
-            <h1 className="animate-fade-in-up d-3 text-balance font-heading text-2xl font-semibold leading-tight text-foreground sm:text-3xl md:text-4xl">
-              {childName}
-            </h1>
-            <p className="animate-fade-in-up d-3 mt-2 text-lg text-muted-foreground">
-              Holy Baptism
-            </p>
+            <ScrollReveal delay={200}>
+              <div className="mx-auto mb-6 flex h-44 w-44 items-center justify-center rounded-[2.5rem] border-4 border-primary/20 bg-white p-2 shadow-xl sm:h-56 sm:w-56">
+                <div className="relative h-full w-full overflow-hidden rounded-[2rem] bg-white">
+                  <Image
+                    src="/baby.png"
+                    alt={childName}
+                    fill
+                    className="object-cover"
+                    priority
+                  />
+                </div>
+              </div>
+            </ScrollReveal>
+
+            <ScrollReveal delay={300}>
+              <h1 className="text-balance font-heading text-4xl font-semibold leading-tight text-foreground sm:text-5xl md:text-6xl">
+                {childName}
+              </h1>
+            </ScrollReveal>
+
+            <ScrollReveal delay={400}>
+              <p className="mt-2 text-lg font-medium text-muted-foreground sm:text-xl">
+                Holy Baptism
+              </p>
+            </ScrollReveal>
           </div>
 
-          <CardContent className="space-y-8 px-6 pb-10 text-center sm:px-10 sm:pb-12">
-            <div className="animate-fade-in-up d-4 space-y-4">
-              <p className="text-lg leading-relaxed text-foreground">
-                Dear <span className="font-semibold">{guest.name}</span>,
-              </p>
-              {details?.message && (
-                <p className="text-base leading-relaxed text-muted-foreground">
-                  {details.message.replace(/\{godparent\}/g, guest.role.charAt(0).toUpperCase() + guest.role.slice(1))}
-                </p>
-              )}
-            </div>
-
-            {eventItems.length > 0 && (
-              <div className="animate-fade-in d-5 rounded-2xl bg-secondary/40 p-5 text-left">
-                <div className="mb-4 text-center">
-                  <span className="text-xs font-medium uppercase tracking-widest">
-                    Event Details
+          <CardContent className="space-y-8 px-5 pb-10 text-center sm:px-8 sm:pb-12 lg:px-12">
+            {/* Greeting */}
+            <InviteSection delay={500} icon={Heart} title="A loving invitation">
+              <div className="space-y-4">
+                <p className="text-xl font-medium text-foreground sm:text-2xl">
+                  Dear{" "}
+                  <span className="font-heading font-semibold text-primary">
+                    {guest.name}
                   </span>
-                </div>
-                <ul className="space-y-4">
+                  ,
+                </p>
+                {details?.message ? (
+                  <p className="mx-auto max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+                    {details.message.replace(
+                      /\{godparent\}/g,
+                      roleLabel
+                    )}
+                  </p>
+                ) : (
+                  <p className="mx-auto max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+                    We would be honored if you would stand with us as{" "}
+                    <span className="font-semibold text-foreground">
+                      {roleLabel}
+                    </span>{" "}
+                    for our child on this blessed day.
+                  </p>
+                )}
+              </div>
+            </InviteSection>
+
+            {/* Event Details */}
+            {eventItems.length > 0 && (
+              <InviteSection
+                delay={600}
+                icon={RattleIcon}
+                title="Event Details"
+              >
+                <div className="space-y-5 text-left">
                   {eventItems.map((item, index) => {
                     if (!item) return null;
                     const Icon = item.icon;
                     return (
-                      <li key={index} className="animate-slide-in-left space-y-2" style={{ animationDelay: `${500 + index * 80}ms` }}>
-                        <div className="flex items-center gap-3">
-                          <div className="h-px flex-1 bg-primary/20" />
-                          <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                      <div
+                        key={index}
+                        className="group flex items-start gap-4 rounded-2xl bg-secondary/50 p-4 transition-all duration-200 hover:bg-secondary hover:shadow-sm"
+                      >
+                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-transform group-hover:scale-110">
+                          <Icon className="h-5 w-5" />
+                        </div>
+                        <div className="flex-1 pt-0.5">
+                          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                             {item.label}
-                          </span>
-                          <div className="h-px flex-1 bg-primary/20" />
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10">
-                            <Icon className="h-4 w-4 text-primary" />
-                          </div>
-                          <div>
-                            <p className="font-medium text-foreground">
-                              {item.text}
+                          </p>
+                          <p className="mt-0.5 text-base font-semibold text-foreground sm:text-lg">
+                            {item.text}
+                          </p>
+                          {item.subtext && (
+                            <p className="mt-0.5 text-sm text-muted-foreground sm:text-base">
+                              {item.subtext}
                             </p>
-                            {item.subtext && (
-                              <p className="text-sm text-muted-foreground">
-                                {item.subtext}
-                              </p>
-                            )}
-                          </div>
+                          )}
                         </div>
-                      </li>
+                      </div>
                     );
                   })}
-                </ul>
-              </div>
+                </div>
+              </InviteSection>
             )}
 
-            <div className="animate-fade-in-up d-6 border-t border-primary/10 pt-8">
-              {!existing && (
-                <>
-                  <h2 className="mb-1 font-heading text-xl font-semibold">
-                    Kindly Respond
-                  </h2>
-                  <p className="mb-6 text-sm text-muted-foreground">
-                    Please let us know if you can join us.
-                  </p>
-                </>
-              )}
-              <RsvpForm guest={guest} existing={existing} />
-            </div>
+            {/* Baby icon row decoration */}
+            <ScrollReveal delay={700}>
+              <div className="flex items-center justify-center gap-4 rounded-2xl bg-secondary/30 py-4 text-primary/60">
+                <span className="animate-bob" style={{ animationDelay: "0s" }}>
+                  <BootiesIcon className="h-6 w-6" />
+                </span>
+                <span className="animate-bob" style={{ animationDelay: "0.2s" }}>
+                  <BottleIcon className="h-6 w-6" />
+                </span>
+                <span className="animate-bob" style={{ animationDelay: "0.4s" }}>
+                  <BabyFeetIcon className="h-6 w-6" />
+                </span>
+                <span className="animate-float" style={{ animationDelay: "0.6s" }}>
+                  <CloudIcon className="h-6 w-6" />
+                </span>
+              </div>
+            </ScrollReveal>
+
+            {/* RSVP Section */}
+            <ScrollReveal delay={800}>
+              <div className="rounded-3xl border border-primary/10 bg-gradient-to-b from-primary/5 to-transparent p-6 sm:p-8">
+                {!existing && (
+                  <div className="mb-6 text-center">
+                    <h2 className="font-heading text-2xl font-semibold text-foreground sm:text-3xl">
+                      Kindly Respond
+                    </h2>
+                    <p className="mt-1 text-sm text-muted-foreground sm:text-base">
+                      Please let us know if you can join us on this special day.
+                    </p>
+                  </div>
+                )}
+                <RsvpForm guest={guest} existing={existing} />
+              </div>
+            </ScrollReveal>
           </CardContent>
         </Card>
+
+        {/* Footer note */}
+        <ScrollReveal delay={900}>
+          <p className="mt-8 text-center text-sm text-muted-foreground/80 sm:text-base">
+            With love and gratitude,
+            <br />
+            <span className="font-heading font-medium text-foreground">
+              The Family
+            </span>
+          </p>
+        </ScrollReveal>
       </div>
     </div>
   );
