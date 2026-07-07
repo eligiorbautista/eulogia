@@ -21,7 +21,13 @@ export function ScrollReveal({ children, className = "", delay = 0 }: ScrollReve
     }
 
     element.classList.add("reveal-hidden");
-    (element as HTMLElement).style.transitionDelay = `${delay}ms`;
+
+    const rect = element.getBoundingClientRect();
+    const isInInitialViewport = rect.top < window.innerHeight;
+
+    (element as HTMLElement).style.transitionDelay = isInInitialViewport
+      ? `${delay}ms`
+      : "0ms";
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -31,7 +37,7 @@ export function ScrollReveal({ children, className = "", delay = 0 }: ScrollReve
           observer.unobserve(element);
         }
       },
-      { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }
+      { threshold: 0, rootMargin: "0px 0px 0px 0px" }
     );
 
     observer.observe(element);

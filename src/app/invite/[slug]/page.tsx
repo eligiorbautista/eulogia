@@ -13,10 +13,9 @@ import {
   BootiesIcon,
   BottleIcon,
   CloudIcon,
-  StarIcon,
   BabyFeetIcon,
 } from "@/components/invite/baby-icons";
-import { Calendar, MapPin, Shirt, Cross, Heart, CheckCircle2 } from "lucide-react";
+import { Calendar, MapPin, Shirt, Heart, CheckCircle2 } from "lucide-react";
 
 interface InvitePageProps {
   params: Promise<{ slug: string }>;
@@ -99,28 +98,26 @@ export default async function InvitePage({ params }: InvitePageProps) {
       data-gender={gender}
       className="relative min-h-full overflow-hidden bg-gradient-to-b from-background via-soft/60 to-background px-4 py-8 sm:py-12"
     >
-      <EnvelopeOpening gender={gender} />
+      <EnvelopeOpening gender={gender} childName={childName} />
       <FloatingShapes gender={gender} />
 
       <div className="relative mx-auto max-w-xl sm:max-w-2xl lg:max-w-3xl">
-        {/* Page 1 — Cover */}
+        {/* Page 1 — Cover with Invitation & Blessings */}
         <StorybookPage
           delay={2400}
           className="mb-6 sm:mb-8"
         >
           <div className="text-center">
-            <div className="mb-4 inline-flex items-center justify-center rounded-full bg-primary/10 px-4 py-2 text-primary">
-              <Cross className="mr-2 h-4 w-4" />
-              <span className="text-xs font-semibold uppercase tracking-[0.2em]">
-                Baptismal Invitation
-              </span>
-            </div>
-
-            <div className="relative mx-auto mb-6 flex h-44 w-44 items-center justify-center rounded-[2.5rem] border-4 border-white bg-white p-2 shadow-xl sm:h-56 sm:w-56">
-              <SparkleDecoration />
-              <div className="relative h-full w-full overflow-hidden rounded-[2rem] bg-white">
+            <div className="relative mx-auto mb-6 h-44 w-44 sm:h-56 sm:w-56">
+              {/* Soft outer glow */}
+              <div className="absolute -inset-3 rounded-full bg-primary/20 blur-2xl" aria-hidden="true" />
+              {/* Decorative ring */}
+              <div className="absolute -inset-1 rounded-full bg-gradient-to-br from-primary/30 via-accent/40 to-primary/30" aria-hidden="true" />
+              {/* Photo frame */}
+              <div className="relative h-full w-full overflow-hidden rounded-full border-4 border-white bg-white shadow-xl">
+                <SparkleDecoration />
                 <Image
-                  src="/baby.png"
+                  src="/baby.jpg"
                   alt={childName}
                   fill
                   className="object-cover"
@@ -135,17 +132,15 @@ export default async function InvitePage({ params }: InvitePageProps) {
             <p className="mt-2 text-lg font-medium text-muted-foreground sm:text-xl">
               Holy Baptism
             </p>
-          </div>
-        </StorybookPage>
 
-        {/* Page 2 — The Invitation */}
-        <StorybookPage
-          label="The Invitation"
-          icon={Heart}
-          delay={2600}
-          className="mb-6 sm:mb-8"
-        >
-          <div className="space-y-4 text-center">
+            {/* Divider */}
+            <div className="mx-auto my-6 flex items-center justify-center gap-3 text-primary/30">
+              <span className="h-px w-12 bg-primary/20 sm:w-16" />
+              <Heart className="h-4 w-4" />
+              <span className="h-px w-12 bg-primary/20 sm:w-16" />
+            </div>
+
+            {/* The Invitation — greeting & message */}
             <p className="text-xl font-medium text-foreground sm:text-2xl">
               Dear{" "}
               <span className="font-heading font-semibold text-primary">
@@ -154,25 +149,46 @@ export default async function InvitePage({ params }: InvitePageProps) {
               ,
             </p>
             {details?.message ? (
-              <p className="mx-auto max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+              <p className="mx-auto mt-3 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
                 {details.message.replace(/\{godparent\}/g, roleLabel)}
               </p>
             ) : (
-              <p className="mx-auto max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+              <p className="mx-auto mt-3 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
                 We would be honored if you would stand with us as{" "}
                 <span className="font-semibold text-foreground">{roleLabel}</span>{" "}
                 for our child on this blessed day.
               </p>
             )}
+
+            {/* Blessings — baby icons + blessing line */}
+            <div className="mt-6 flex flex-col items-center gap-3">
+              <div className="flex items-center justify-center gap-3 text-primary/40">
+                <span className="animate-bob" style={{ animationDelay: "0s" }}>
+                  <BootiesIcon className="h-5 w-5" />
+                </span>
+                <span className="animate-bob" style={{ animationDelay: "0.15s" }}>
+                  <BottleIcon className="h-5 w-5" />
+                </span>
+                <span className="animate-bob" style={{ animationDelay: "0.3s" }}>
+                  <BabyFeetIcon className="h-5 w-5" />
+                </span>
+                <span className="animate-float" style={{ animationDelay: "0.45s" }}>
+                  <CloudIcon className="h-5 w-5" />
+                </span>
+              </div>
+              <p className="mx-auto max-w-md text-base italic leading-relaxed text-muted-foreground sm:text-lg">
+                May your love and guidance bless our child always.
+              </p>
+            </div>
           </div>
         </StorybookPage>
 
-        {/* Page 3 — The Day */}
+        {/* Page 2 — The Day */}
         {eventItems.length > 0 && (
           <StorybookPage
             label="The Day"
             icon={RattleIcon}
-            delay={2800}
+            delay={2600}
             className="mb-6 sm:mb-8"
           >
             <div className="space-y-4 text-left">
@@ -207,39 +223,11 @@ export default async function InvitePage({ params }: InvitePageProps) {
           </StorybookPage>
         )}
 
-        {/* Page 4 — Blessings */}
-        <StorybookPage
-          label="Blessings"
-          icon={StarIcon}
-          delay={3000}
-          className="mb-6 sm:mb-8"
-        >
-          <div className="text-center">
-            <div className="mb-4 flex items-center justify-center gap-4 rounded-2xl bg-secondary/30 py-4 text-primary/60">
-              <span className="animate-bob" style={{ animationDelay: "0s" }}>
-                <BootiesIcon className="h-6 w-6" />
-              </span>
-              <span className="animate-bob" style={{ animationDelay: "0.2s" }}>
-                <BottleIcon className="h-6 w-6" />
-              </span>
-              <span className="animate-bob" style={{ animationDelay: "0.4s" }}>
-                <BabyFeetIcon className="h-6 w-6" />
-              </span>
-              <span className="animate-float" style={{ animationDelay: "0.6s" }}>
-                <CloudIcon className="h-6 w-6" />
-              </span>
-            </div>
-            <p className="mx-auto max-w-md text-base italic leading-relaxed text-muted-foreground sm:text-lg">
-              May your love and guidance bless our child always.
-            </p>
-          </div>
-        </StorybookPage>
-
-        {/* Page 5 — Your Response */}
+        {/* Page 3 — Your Response */}
         <StorybookPage
           label="Your Response"
           icon={CheckCircle2}
-          delay={3200}
+          delay={2800}
           className="mb-6 sm:mb-8"
         >
           <div className="rounded-3xl border border-primary/10 bg-gradient-to-b from-primary/5 to-transparent p-5 sm:p-8">
@@ -258,7 +246,7 @@ export default async function InvitePage({ params }: InvitePageProps) {
         </StorybookPage>
 
         {/* Closing */}
-        <StorybookPage delay={3400} className="text-center">
+        <StorybookPage delay={3000} className="text-center">
           <p className="text-sm text-muted-foreground/80 sm:text-base">
             With love and gratitude,
             <br />
