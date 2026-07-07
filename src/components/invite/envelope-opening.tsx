@@ -22,7 +22,7 @@ export function EnvelopeOpening({ gender, childName, onOpenComplete }: EnvelopeO
       return;
     }
 
-    const timers: NodeJS.Timeout[] = [];
+    const timers: ReturnType<typeof setTimeout>[] = [];
 
     timers.push(setTimeout(() => setPhase("opening"), 600));
     timers.push(setTimeout(() => setPhase("revealing"), 1400));
@@ -72,28 +72,41 @@ export function EnvelopeOpening({ gender, childName, onOpenComplete }: EnvelopeO
           </p>
         </div>
 
-        {/* Envelope body — soft pastel, visible */}
-        <div className="relative aspect-[1.4/1] overflow-hidden rounded-3xl border border-primary/15 bg-gradient-to-br from-primary/25 to-primary/40 shadow-xl shadow-primary/20">
-          {/* Top flap — folds back on open */}
-          <div
-            className={`absolute inset-x-0 top-0 z-20 h-1/2 origin-top bg-gradient-to-b from-primary/35 to-primary/20 ${
-              isOpening ? "animate-envelope-flap" : ""
-            }`}
-            style={{
-              clipPath: "polygon(0 0, 100% 0, 50% 100%)",
-              backfaceVisibility: "hidden",
-            }}
-          />
+        {/* Envelope body — with perspective for 3D flap */}
+        <div
+          className="relative overflow-hidden rounded-3xl border border-primary/15 bg-gradient-to-br from-primary/25 to-primary/40 shadow-xl shadow-primary/20"
+          style={{
+            width: "100%",
+            paddingTop: "71.43%",
+            perspective: "1000px",
+            transformStyle: "preserve-3d",
+          }}
+        >
+          {/* Inner content positioned absolutely to replace aspect-ratio */}
+          <div className="absolute inset-0">
+            {/* Top flap — folds back on open */}
+            <div
+              className={`absolute inset-x-0 top-0 z-20 h-1/2 origin-top bg-gradient-to-b from-primary/35 to-primary/20 ${
+                isOpening ? "animate-envelope-flap" : ""
+              }`}
+              style={{
+                clipPath: "polygon(0 0, 100% 0, 50% 100%)",
+                WebkitClipPath: "polygon(0 0, 100% 0, 50% 100%)",
+                backfaceVisibility: "hidden",
+                WebkitBackfaceVisibility: "hidden",
+              }}
+            />
 
-          {/* Front face with wax seal */}
-          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-white/85 to-white/60">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/15 ring-2 ring-primary/25 sm:h-14 sm:w-14">
-              <Heart className="h-5 w-5 text-primary sm:h-6 sm:w-6" />
+            {/* Front face with wax seal */}
+            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-white/85 to-white/60">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/15 ring-2 ring-primary/25 sm:h-14 sm:w-14">
+                <Heart className="h-5 w-5 text-primary sm:h-6 sm:w-6" />
+              </div>
             </div>
-          </div>
 
-          {/* Subtle bottom shadow inside envelope */}
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-primary/10 to-transparent" />
+            {/* Subtle bottom shadow inside envelope */}
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-primary/10 to-transparent" />
+          </div>
         </div>
       </div>
     </div>
