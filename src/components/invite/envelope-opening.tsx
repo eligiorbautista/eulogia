@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Heart } from "lucide-react";
 
 interface EnvelopeOpeningProps {
@@ -10,31 +10,68 @@ interface EnvelopeOpeningProps {
 }
 
 export function EnvelopeOpening({ gender, childName, onOpenComplete }: EnvelopeOpeningProps) {
-  const [phase, setPhase] = useState<"sealed" | "opening" | "revealing" | "done">("sealed");
+  const [phase, setPhase] = useState<"ready" | "opening" | "revealing" | "done">("ready");
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   useEffect(() => {
+    audioRef.current = new Audio("/sounds/envelope-open.wav");
+    audioRef.current.preload = "auto";
+    audioRef.current.load();
+
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     setPrefersReducedMotion(mediaQuery.matches);
 
     if (mediaQuery.matches) {
       onOpenComplete?.();
-      return;
     }
 
-    const timers: ReturnType<typeof setTimeout>[] = [];
+    return () => {
+      timersRef.current.forEach(clearTimeout);
+      timersRef.current = [];
+    };
+  }, [onOpenComplete]);
 
-    timers.push(setTimeout(() => setPhase("opening"), 600));
-    timers.push(setTimeout(() => setPhase("revealing"), 1400));
-    timers.push(
+  const startAnimation = useCallback(() => {
+    timersRef.current.forEach(clearTimeout);
+    timersRef.current = [];
+
+    timersRef.current.push(
+      setTimeout(() => setPhase("opening"), 600)
+    );
+    timersRef.current.push(
+      setTimeout(() => setPhase("revealing"), 1400)
+    );
+    timersRef.current.push(
       setTimeout(() => {
         setPhase("done");
         onOpenComplete?.();
       }, 2400)
     );
-
-    return () => timers.forEach(clearTimeout);
   }, [onOpenComplete]);
+
+  const handleOpen = useCallback(async () => {
+    if (phase !== "ready" || prefersReducedMotion) return;
+
+    try {
+      await audioRef.current?.play();
+    } catch {
+      // Autoplay or playback failed; continue animation silently.
+    }
+
+    startAnimation();
+  }, [phase, prefersReducedMotion, startAnimation]);
+
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLButtonElement>) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        handleOpen();
+      }
+    },
+    [handleOpen]
+  );
 
   if (prefersReducedMotion || phase === "done") {
     return null;
@@ -44,11 +81,14 @@ export function EnvelopeOpening({ gender, childName, onOpenComplete }: EnvelopeO
   const isRevealing = phase === "revealing";
 
   return (
-    <div
-      className={`fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-gradient-to-b from-background via-soft to-background px-6 transition-opacity duration-700 ${
+    <button
+      type="button"
+      onClick={handleOpen}
+      onKeyDown={handleKeyDown}
+      aria-label="Open invitation"
+      className={`fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-background via-soft to-background px-6 transition-opacity duration-700 ${
         isRevealing ? "pointer-events-none opacity-0" : "opacity-100"
       }`}
-      aria-hidden="true"
     >
       <div className="relative w-[min(78vw,300px)] sm:w-[min(56vw,380px)] lg:w-[380px]">
         {/* Soft glow behind envelope */}
@@ -109,6 +149,16 @@ export function EnvelopeOpening({ gender, childName, onOpenComplete }: EnvelopeO
           </div>
         </div>
       </div>
-    </div>
+
+      {/* Tap to open cue */}
+      {phase === "ready" && (
+        <div className="absolute bottom-[15%] left-0 right-0 text-center">
+          <span className="animate-pulse-soft inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
+            <Heart className="h-4 w-4" />
+            Tap to open
+          </span>
+        </div>
+      )}
+    </button>
   );
 }

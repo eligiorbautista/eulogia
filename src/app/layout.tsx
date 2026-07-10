@@ -23,6 +23,11 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: "Eulogia | Baptism Invitation",
   description: "You are lovingly invited to our child's baptism.",
+  icons: {
+    icon: "/favicon-32x32.png",
+    shortcut: "/favicon-16x16.png",
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export default async function RootLayout({

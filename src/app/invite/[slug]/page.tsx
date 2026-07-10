@@ -104,7 +104,6 @@ export default async function InvitePage({ params }: InvitePageProps) {
       <div className="relative mx-auto max-w-xl sm:max-w-2xl lg:max-w-3xl">
         {/* Page 1 — Cover with Invitation & Blessings */}
         <StorybookPage
-          delay={2400}
           className="mb-6 sm:mb-8"
         >
           <div className="text-center">
