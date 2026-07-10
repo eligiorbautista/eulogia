@@ -1,17 +1,10 @@
 import Link from "next/link";
 import { db } from "@/db";
-import { StatsCard } from "@/components/admin/stats-card";
-import { EventDetailsForm } from "@/components/admin/event-details-form";
-import { CopyInviteUrl } from "@/components/admin/copy-invite-url";
+import { DashboardStats } from "@/components/admin/dashboard-stats";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Pencil, Plus, FileText } from "lucide-react";
+import { Plus, Pencil } from "lucide-react";
 
 export default async function DashboardPage() {
   const allGuests = await db.query.guests.findMany({
@@ -26,86 +19,82 @@ export default async function DashboardPage() {
   const totalGuests = allGuests.length;
   const answeredGuests = allResponses.length;
   const attendingCount = allResponses.filter((r) => r.canAttendBaptism).length;
-  const willingCount = allResponses.filter(
-    (r) => r.willBeGodparent
-  ).length;
+  const willingCount = allResponses.filter((r) => r.willBeGodparent).length;
+
+  const recentGuests = allGuests.slice(0, 5);
 
   return (
     <div className="mx-auto max-w-5xl space-y-8">
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatsCard title="Total Guests" value={totalGuests} />
-        <StatsCard title="Answered" value={answeredGuests} />
-        <StatsCard title="Attending" value={attendingCount} />
-        <StatsCard title="Willing Godparent" value={willingCount} />
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">
+            {details?.childName ? `${details.childName}'s Baptism` : "Admin Dashboard"}
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Manage invitations, guests, and event details.
+          </p>
+        </div>
+        <Button asChild>
+          <Link href="/admin/guests/new">
+            <Plus className="mr-2 h-4 w-4" />
+            Add Guest
+          </Link>
+        </Button>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-xl font-semibold">Guests</h2>
-        <div className="flex flex-wrap gap-2">
-          <Button asChild variant="outline" className="border-foreground/30 bg-white text-foreground hover:bg-foreground/5">
-            <Link href="/admin/export">
-              <FileText className="mr-2 h-4 w-4" />
-              Print / Export
-            </Link>
-          </Button>
-          <Button asChild>
-            <Link href="/admin/guests/new">
-              <Plus className="mr-2 h-4 w-4" />
-              Add Guest
-            </Link>
-          </Button>
-        </div>
-      </div>
+      <DashboardStats
+        totalGuests={totalGuests}
+        answeredGuests={answeredGuests}
+        attendingCount={attendingCount}
+        willingCount={willingCount}
+      />
 
       <Card>
         <CardHeader>
-          <CardTitle>Guest List</CardTitle>
+          <CardTitle>Recent Guests</CardTitle>
         </CardHeader>
         <CardContent>
-          {allGuests.length === 0 ? (
-            <p className="text-muted-foreground">
-              No guests yet. Add one to generate an invite URL.
-            </p>
+          {recentGuests.length === 0 ? (
+            <div className="py-8 text-center">
+              <p className="text-muted-foreground">No guests yet.</p>
+              <Button asChild className="mt-4">
+                <Link href="/admin/guests/new">Add your first guest</Link>
+              </Button>
+            </div>
           ) : (
-            <ul className="space-y-3">
-              {allGuests.map((guest) => {
+            <ul className="divide-y">
+              {recentGuests.map((guest) => {
                 const response = responseByGuestId.get(guest.id);
                 return (
                   <li
                     key={guest.id}
-                    className="flex flex-col gap-3 rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between"
+                    className="flex flex-col gap-2 py-4 sm:flex-row sm:items-center sm:justify-between"
                   >
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate font-medium">{guest.name}</p>
+                    <div>
+                      <p className="font-medium">{guest.name}</p>
                       <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
                         <Badge variant="secondary" className="capitalize">
                           {guest.role}
                         </Badge>
-                        <span className="truncate">/invite/{guest.slug}</span>
-                        {response && (
+                        {response ? (
                           <Badge
                             variant={
-                              response.canAttendBaptism
-                                ? "default"
-                                : "destructive"
+                              response.canAttendBaptism ? "default" : "destructive"
                             }
                           >
-                            {response.canAttendBaptism
-                              ? "Attending"
-                              : "Not attending"}
+                            {response.canAttendBaptism ? "Attending" : "Not attending"}
                           </Badge>
+                        ) : (
+                          <Badge variant="outline">No response</Badge>
                         )}
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <CopyInviteUrl slug={guest.slug} />
-                      <Button asChild variant="outline" size="icon">
-                        <Link href={`/admin/guests/${guest.id}/edit`}>
-                          <Pencil className="h-4 w-4" />
-                          <span className="sr-only">Edit</span>
-                        </Link>
-                      </Button>
-                    </div>
+                    <Button asChild variant="outline" size="sm">
+                      <Link href={`/admin/guests/${guest.id}/edit`}>
+                        <Pencil className="mr-2 h-3.5 w-3.5" />
+                        Edit
+                      </Link>
+                    </Button>
                   </li>
                 );
               })}
@@ -113,10 +102,6 @@ export default async function DashboardPage() {
           )}
         </CardContent>
       </Card>
-
-      <EventDetailsForm
-        details={details}
-      />
     </div>
   );
 }
