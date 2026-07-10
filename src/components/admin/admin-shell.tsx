@@ -21,7 +21,7 @@ const navItems = [
   { href: "/admin/event-details", label: "Event Details", icon: CalendarHeart },
 ];
 
-function NavList({ onNavigate }: { onNavigate?: () => void }) {
+function NavList({ closeOnNavigate = false }: { closeOnNavigate?: boolean }) {
   const pathname = usePathname();
 
   return (
@@ -29,11 +29,9 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
       {navItems.map((item) => {
         const Icon = item.icon;
         const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
-        return (
+        const link = (
           <Link
-            key={item.href}
             href={item.href}
-            onClick={onNavigate}
             aria-current={isActive ? "page" : undefined}
             className={cn(
               "flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors",
@@ -45,6 +43,15 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
             <Icon className="h-5 w-5" />
             {item.label}
           </Link>
+        );
+        return (
+          <div key={item.href}>
+            {closeOnNavigate ? (
+              <SheetClose asChild>{link}</SheetClose>
+            ) : (
+              link
+            )}
+          </div>
         );
       })}
     </nav>
@@ -102,14 +109,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </SheetTrigger>
           <SheetContent side="left" className="flex w-60 flex-col p-4">
             <SheetHeader className="text-left">
-              <SheetTitle>
-                <Brand />
-              </SheetTitle>
+              <SheetTitle className="text-left">Eulogia Admin</SheetTitle>
             </SheetHeader>
             <div className="flex-1 py-6">
-              <SheetClose asChild>
-                <NavList />
-              </SheetClose>
+              <NavList closeOnNavigate />
             </div>
             <div className="border-t pt-4">
               <LogoutForm />
