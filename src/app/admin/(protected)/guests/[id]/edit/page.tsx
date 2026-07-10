@@ -34,29 +34,21 @@ export default async function EditGuestPage({ params }: EditGuestPageProps) {
   const deleteAction = deleteGuest.bind(null, guest.id);
 
   return (
-    <>
-      <div className="no-print mb-4 max-w-5xl mx-auto">
-        <Button asChild variant="ghost" size="sm">
-          <Link href="/admin/dashboard">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Dashboard
-          </Link>
-        </Button>
-      </div>
-      <div className="mx-auto max-w-xl">
-        <Card>
-          <CardHeader>
-            <CardTitle>Edit Guest</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <GuestForm
-              guest={guest}
-              action={updateAction}
-              deleteAction={deleteAction}
-            />
-          </CardContent>
-        </Card>
-      </div>
-    </>
+    <div className="mx-auto max-w-xl space-y-4">
+      <Button asChild variant="ghost" size="sm" className="-ml-3">
+        <Link href="/admin/guests">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Guests
+        </Link>
+      </Button>
+      <Card>
+        <CardHeader>
+          <CardTitle>Edit Guest</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <GuestForm guest={guest} action={updateAction} deleteAction={deleteAction} />
+        </CardContent>
+      </Card>
+    </div>
   );
 }
