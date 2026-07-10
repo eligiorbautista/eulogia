@@ -58,12 +58,12 @@ function NavList({ closeOnNavigate = false }: { closeOnNavigate?: boolean }) {
   );
 }
 
-function Brand() {
+function Brand({ as: Component = "div" }: { as?: "div" | "span" }) {
   return (
-    <div className="flex flex-col leading-tight">
+    <Component className="flex flex-col leading-tight">
       <span className="text-lg font-semibold text-primary">Eulogia</span>
       <span className="text-xs text-muted-foreground">Admin</span>
-    </div>
+    </Component>
   );
 }
 
@@ -109,7 +109,9 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </SheetTrigger>
           <SheetContent side="left" className="flex w-60 flex-col p-4">
             <SheetHeader className="text-left">
-              <SheetTitle className="text-left">Eulogia Admin</SheetTitle>
+              <SheetTitle className="text-left">
+              <Brand as="span" />
+            </SheetTitle>
             </SheetHeader>
             <div className="flex-1 py-6">
               <NavList closeOnNavigate />

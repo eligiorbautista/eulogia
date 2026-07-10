@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { db } from "@/db";
-import { GuestFilters, type FilterValue } from "@/components/admin/guest-filters";
+import {
+  GuestFilters,
+  FILTER_VALUES,
+  type FilterValue,
+} from "@/components/admin/guest-filters";
 import { GuestsTable } from "@/components/admin/guests-table";
 import { GuestsList } from "@/components/admin/guests-list";
 import { Button } from "@/components/ui/button";
@@ -35,7 +39,9 @@ function matchesFilter(
 export default async function GuestsPage({ searchParams }: GuestsPageProps) {
   const params = await searchParams;
   const query = (params.q ?? "").toLowerCase();
-  const filter = (params.filter as FilterValue) ?? "all";
+  const filter = FILTER_VALUES.includes(params.filter as FilterValue)
+    ? (params.filter as FilterValue)
+    : "all";
 
   const allGuests = await db.query.guests.findMany({
     orderBy: (guests, { desc }) => [desc(guests.createdAt)],
@@ -77,18 +83,27 @@ export default async function GuestsPage({ searchParams }: GuestsPageProps) {
 
       {filteredGuests.length === 0 ? (
         <div className="rounded-lg border border-dashed py-12 text-center">
-          <p className="text-muted-foreground">No guests match your search.</p>
-          {query || filter !== "all" ? (
-            <Link
-              href="/admin/guests"
-              className="mt-2 inline-block text-sm text-primary hover:underline"
-            >
-              Clear filters
-            </Link>
+          {allGuests.length === 0 ? (
+            <>
+              <p className="text-muted-foreground">No guests yet.</p>
+              <Button asChild className="mt-4">
+                <Link href="/admin/guests/new">Add your first guest</Link>
+              </Button>
+            </>
           ) : (
-            <Button asChild className="mt-4">
-              <Link href="/admin/guests/new">Add your first guest</Link>
-            </Button>
+            <>
+              <p className="text-muted-foreground">
+                No guests match your search.
+              </p>
+              {query || filter !== "all" ? (
+                <Link
+                  href="/admin/guests"
+                  className="mt-2 inline-block text-sm text-primary hover:underline"
+                >
+                  Clear filters
+                </Link>
+              ) : null}
+            </>
           )}
         </div>
       ) : (
