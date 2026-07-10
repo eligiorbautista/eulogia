@@ -65,30 +65,22 @@ function writeWav(filename, samples) {
 }
 
 function generateEnvelopeSound() {
-  const totalDuration = 1.5;
+  const totalDuration = 1.0;
   const totalSamples = Math.floor(SAMPLE_RATE * totalDuration);
   const samples = new Float32Array(totalSamples).fill(0);
 
-  // Rustling noise (0 - 0.6s)
-  const rustleDuration = 0.6;
+  // Paper page-turn rustle: white noise shaped by a quick burst envelope
+  // and amplitude-modulated with slower noise for a crinkly texture.
+  const rustleDuration = 0.7;
   const rustleSamples = Math.floor(SAMPLE_RATE * rustleDuration);
+
   for (let i = 0; i < rustleSamples; i++) {
     const t = i / SAMPLE_RATE;
-    const envelope = Math.min(1, t / 0.1) * Math.min(1, (rustleDuration - t) / 0.15);
-    samples[i] += (Math.random() * 2 - 1) * envelope * 0.4;
-  }
-
-  // Magical chime (0.3s - 1.2s, 880Hz A5 with decay)
-  const chimeStart = 0.3;
-  const chimeDuration = 0.9;
-  const chimeSamples = Math.floor(SAMPLE_RATE * chimeDuration);
-  const frequency = 880;
-  for (let i = 0; i < chimeSamples; i++) {
-    const t = i / SAMPLE_RATE;
-    const sampleIndex = Math.floor((chimeStart + t) * SAMPLE_RATE);
-    if (sampleIndex >= totalSamples) break;
-    const decay = Math.exp(-t * 4);
-    samples[sampleIndex] += Math.sin(2 * Math.PI * frequency * t) * decay * 0.5;
+    const envelope = Math.min(1, t / 0.04) * Math.min(1, (rustleDuration - t) / 0.25);
+    const noise = Math.random() * 2 - 1;
+    const crinkle = 0.5 + 0.5 * Math.sin(i * 0.03) * Math.random();
+    const emphasized = noise * (0.6 + 0.4 * Math.sin(i * 0.15));
+    samples[i] += emphasized * crinkle * envelope * 0.55;
   }
 
   return samples;

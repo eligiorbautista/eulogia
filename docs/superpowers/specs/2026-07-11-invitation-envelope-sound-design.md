@@ -24,10 +24,9 @@ Add synchronized sound effects to the baptism invitation envelope opening animat
 
 ## Audio Design
 - **Format:** WAV (`public/sounds/envelope-open.wav`)
-- **Length:** ~1.5 seconds
+- **Length:** ~1.0 second
 - **Layers:**
-  1. **Paper/rustling noise** (first ~0.6s) — simulates the envelope flap moving.
-  2. **Magical chime/sparkle** (overlapping, ~0.8s) — a short decaying sine wave tone for a celebratory feel.
+  1. **Paper page-turn rustle** — white noise shaped by a quick burst envelope and modulated with slower crinkle texture to mimic a page being turned or paper being handled.
 - **Source:** Generated locally via a Node.js script using raw audio synthesis. This avoids copyright issues and external dependencies. The file can be replaced later with a professionally produced sound.
 
 ## Technical Design
