@@ -120,6 +120,7 @@ export default async function InvitePage({ params }: InvitePageProps) {
                   src="/images/leo.png"
                   alt={childName}
                   fill
+                  sizes="(max-width: 640px) 176px, 224px"
                   className="object-cover"
                   priority
                 />
