@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -20,7 +21,15 @@ export function GuestFilters() {
   const query = searchParams.get("q") ?? "";
   const filter = (searchParams.get("filter") as FilterValue) ?? "all";
 
-  const updateParams = (updates: Record<string, string>) => {
+  const [inputValue, setInputValue] = useState(query);
+  const [prevQuery, setPrevQuery] = useState(query);
+
+  if (query !== prevQuery) {
+    setPrevQuery(query);
+    setInputValue(query);
+  }
+
+  const updateParams = useCallback((updates: Record<string, string>) => {
     const params = new URLSearchParams(searchParams.toString());
     Object.entries(updates).forEach(([key, value]) => {
       if (value) {
@@ -29,8 +38,17 @@ export function GuestFilters() {
         params.delete(key);
       }
     });
-    router.push(`?${params.toString()}`, { scroll: false });
-  };
+    router.replace(`?${params.toString()}`, { scroll: false });
+  }, [searchParams, router]);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (inputValue !== query) {
+        updateParams({ q: inputValue });
+      }
+    }, 300);
+    return () => clearTimeout(timeout);
+  }, [inputValue, query, updateParams]);
 
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -39,8 +57,8 @@ export function GuestFilters() {
         <Input
           type="search"
           placeholder="Search guests by name..."
-          defaultValue={query}
-          onChange={(e) => updateParams({ q: e.target.value })}
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
           className="pl-9"
         />
       </div>

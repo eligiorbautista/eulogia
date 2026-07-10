@@ -39,7 +39,7 @@ export function GuestsList({ guests, responseByGuestId }: GuestsListProps) {
                 <Button asChild variant="outline" size="icon">
                   <Link href={`/admin/guests/${guest.id}/edit`}>
                     <Pencil className="h-4 w-4" />
-                    <span className="sr-only">Edit</span>
+                    <span className="sr-only">Edit {guest.name}</span>
                   </Link>
                 </Button>
               </div>
