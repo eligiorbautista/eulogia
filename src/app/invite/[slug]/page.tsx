@@ -7,6 +7,7 @@ import { RsvpForm } from "@/components/invite/rsvp-form";
 import { FloatingShapes } from "@/components/invite/floating-shapes";
 import { InviteShell } from "./invite-shell";
 import { StorybookPage } from "@/components/invite/storybook-page";
+import { Footer } from "@/components/footer";
 import { SparkleDecoration } from "@/components/invite/sparkle-decoration";
 import {
   RattleIcon,
@@ -255,6 +256,8 @@ export default async function InvitePage({ params }: InvitePageProps) {
           </p>
         </StorybookPage>
       </div>
+
+      <Footer />
     </div>
   );
 }
