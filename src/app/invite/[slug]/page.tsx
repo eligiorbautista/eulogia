@@ -5,7 +5,7 @@ import { db } from "@/db";
 import { guests, responses } from "@/db/schema";
 import { RsvpForm } from "@/components/invite/rsvp-form";
 import { FloatingShapes } from "@/components/invite/floating-shapes";
-import { EnvelopeOpening } from "@/components/invite/envelope-opening";
+import { InviteShell } from "./invite-shell";
 import { StorybookPage } from "@/components/invite/storybook-page";
 import { SparkleDecoration } from "@/components/invite/sparkle-decoration";
 import {
@@ -98,7 +98,7 @@ export default async function InvitePage({ params }: InvitePageProps) {
       data-gender={gender}
       className="relative min-h-full overflow-hidden bg-gradient-to-b from-background via-soft/60 to-background px-4 py-8 sm:py-12"
     >
-      <EnvelopeOpening gender={gender} childName={childName} />
+      <InviteShell gender={gender} childName={childName} />
       <FloatingShapes gender={gender} />
 
       <div className="relative mx-auto max-w-xl sm:max-w-2xl lg:max-w-3xl">
