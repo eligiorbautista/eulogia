@@ -117,7 +117,7 @@ export default async function InvitePage({ params }: InvitePageProps) {
               <div className="relative h-full w-full overflow-hidden rounded-full border-4 border-white bg-white shadow-xl">
                 <SparkleDecoration />
                 <Image
-                  src="/images/baby.jpg"
+                  src="/images/leo.png"
                   alt={childName}
                   fill
                   className="object-cover"
