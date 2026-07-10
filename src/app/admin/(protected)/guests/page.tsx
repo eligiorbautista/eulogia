@@ -1,10 +1,7 @@
 import Link from "next/link";
 import { db } from "@/db";
-import {
-  GuestFilters,
-  FILTER_VALUES,
-  type FilterValue,
-} from "@/components/admin/guest-filters";
+import { GuestFilters } from "@/components/admin/guest-filters";
+import { FILTER_VALUES, type FilterValue } from "@/components/admin/guest-filter-types";
 import { GuestsTable } from "@/components/admin/guests-table";
 import { GuestsList } from "@/components/admin/guests-list";
 import { Button } from "@/components/ui/button";
