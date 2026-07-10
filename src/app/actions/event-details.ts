@@ -25,14 +25,33 @@ export async function upsertEventDetails(
     return { error: "Child name and gender are required" };
   }
 
-  const existingRows = await db.query.eventDetails.findMany();
   const now = Date.now();
 
-  if (existingRows.length > 0) {
-    const primary = existingRows[0];
-    await db
-      .update(eventDetails)
-      .set({
+  await db.transaction(async (tx) => {
+    const existingRows = await tx.query.eventDetails.findMany();
+
+    if (existingRows.length > 0) {
+      const primary = existingRows[0];
+      await tx
+        .update(eventDetails)
+        .set({
+          childName,
+          gender,
+          baptismDate: baptismDate || null,
+          baptismTime: baptismTime || null,
+          venueName: venueName || null,
+          venueAddress: venueAddress || null,
+          dressCode: dressCode || null,
+          message: message || null,
+          updatedAt: now,
+        })
+        .where(eq(eventDetails.id, primary.id));
+
+      for (const extra of existingRows.slice(1)) {
+        await tx.delete(eventDetails).where(eq(eventDetails.id, extra.id));
+      }
+    } else {
+      await tx.insert(eventDetails).values({
         childName,
         gender,
         baptismDate: baptismDate || null,
@@ -41,30 +60,14 @@ export async function upsertEventDetails(
         venueAddress: venueAddress || null,
         dressCode: dressCode || null,
         message: message || null,
+        createdAt: now,
         updatedAt: now,
-      })
-      .where(eq(eventDetails.id, primary.id));
-
-    for (const extra of existingRows.slice(1)) {
-      await db.delete(eventDetails).where(eq(eventDetails.id, extra.id));
+      });
     }
-  } else {
-    await db.insert(eventDetails).values({
-      childName,
-      gender,
-      baptismDate: baptismDate || null,
-      baptismTime: baptismTime || null,
-      venueName: venueName || null,
-      venueAddress: venueAddress || null,
-      dressCode: dressCode || null,
-      message: message || null,
-      createdAt: now,
-      updatedAt: now,
-    });
-  }
+  });
 
   revalidatePath("/admin/dashboard");
-  revalidatePath("/admin/export");
-  revalidatePath("/invite");
+  revalidatePath("/admin/event-details");
+  revalidatePath("/invite/[slug]", "page");
   return { success: true };
 }

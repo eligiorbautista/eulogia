@@ -12,15 +12,15 @@ import {
 
 export default async function NewGuestPage() {
   return (
-    <div className="mx-auto max-w-xl space-y-4">
-      <Button asChild variant="ghost" size="sm" className="-ml-3">
-        <Link href="/admin/guests">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Guests
-        </Link>
-      </Button>
+    <div className="mx-auto max-w-xl">
       <Card>
         <CardHeader>
+          <Button asChild variant="ghost" size="sm" className="w-fit">
+            <Link href="/admin/guests">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Guests
+            </Link>
+          </Button>
           <CardTitle>Add Guest</CardTitle>
         </CardHeader>
         <CardContent>

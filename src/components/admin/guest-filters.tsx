@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { parseFilter, type FilterValue } from "./guest-filter-types";
+import { parseFilter } from "./guest-filter-types";
 
 const SEARCH_DEBOUNCE_MS = 300;
 

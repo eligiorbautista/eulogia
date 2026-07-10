@@ -52,7 +52,7 @@ export function EventDetailsForm({
       <CardHeader>
         <CardTitle>Baptism Details</CardTitle>
         <CardDescription>
-          This information appears on every invitation and the export page.
+          This information appears on every invitation.
         </CardDescription>
       </CardHeader>
       <CardContent>

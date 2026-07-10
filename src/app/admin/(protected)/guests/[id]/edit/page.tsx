@@ -22,6 +22,10 @@ export default async function EditGuestPage({ params }: EditGuestPageProps) {
   const { id } = await params;
   const guestId = Number(id);
 
+  if (!Number.isFinite(guestId) || guestId <= 0) {
+    notFound();
+  }
+
   const guest = await db.query.guests.findFirst({
     where: eq(guests.id, guestId),
   });
@@ -34,15 +38,15 @@ export default async function EditGuestPage({ params }: EditGuestPageProps) {
   const deleteAction = deleteGuest.bind(null, guest.id);
 
   return (
-    <div className="mx-auto max-w-xl space-y-4">
-      <Button asChild variant="ghost" size="sm" className="-ml-3">
-        <Link href="/admin/guests">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Guests
-        </Link>
-      </Button>
+    <div className="mx-auto max-w-xl">
       <Card>
         <CardHeader>
+          <Button asChild variant="ghost" size="sm" className="w-fit">
+            <Link href="/admin/guests">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Guests
+            </Link>
+          </Button>
           <CardTitle>Edit Guest</CardTitle>
         </CardHeader>
         <CardContent>

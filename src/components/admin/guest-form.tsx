@@ -50,7 +50,7 @@ export function GuestForm({ guest, action, deleteAction }: GuestFormProps) {
       toast.success("Guest deleted!", {
         description: `${guest?.name} has been removed.`,
       });
-      setTimeout(() => router.push("/admin/dashboard"), 500);
+      setTimeout(() => router.push("/admin/guests"), 500);
     } else if (result?.error) {
       toast.error("Something went wrong", {
         description: result.error,

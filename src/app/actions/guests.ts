@@ -32,7 +32,7 @@ export async function createGuest(
   });
 
   revalidatePath("/admin/dashboard");
-  revalidatePath("/admin/export");
+  revalidatePath("/admin/guests");
   return { success: true };
 }
 
@@ -60,7 +60,7 @@ export async function updateGuest(
     .where(eq(guests.id, id));
 
   revalidatePath("/admin/dashboard");
-  revalidatePath("/admin/export");
+  revalidatePath("/admin/guests");
   return { success: true };
 }
 
@@ -70,6 +70,6 @@ export async function deleteGuest(id: number): Promise<{ error?: string; success
   await db.delete(guests).where(eq(guests.id, id));
 
   revalidatePath("/admin/dashboard");
-  revalidatePath("/admin/export");
+  revalidatePath("/admin/guests");
   return { success: true };
 }
