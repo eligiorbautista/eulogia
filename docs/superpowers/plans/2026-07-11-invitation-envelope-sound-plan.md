@@ -2,15 +2,14 @@
 
 > **For agentic workers:** REQUIRED SUB-AGENT SKILL: Use `superpowers:subagent-driven-development` (recommended) or `superpowers:executing-plans` to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add user-initiated sound effects to the baptism invitation envelope opening animation and replace the default Vercel favicon with the app logo.
+**Goal:** Add user-initiated sound effects and looping background music to the baptism invitation envelope opening animation, and replace the default Vercel favicon with the app logo.
 
-**Architecture:** Use a locally generated WAV asset for the sound, trigger playback from a user-initiated envelope open, and update `metadata.icons` in the root layout to point to `public/app_logo.png`.
+**Architecture:** Use user-supplied MP3 assets (`open-envelope.mp3`, `bg-music.mp3`) for audio, trigger playback from a user-initiated envelope open, and update `metadata.icons` in the root layout to point to generated favicon PNGs.
 
-**Tech Stack:** Next.js 16, React 19, TypeScript, Tailwind CSS 4, shadcn/ui, native HTML `<audio>` API, Node.js buffer-based WAV synthesis.
+**Tech Stack:** Next.js 16, React 19, TypeScript, Tailwind CSS 4, shadcn/ui, native HTML `<audio>` API.
 
 ## Global Constraints
 - No new animation libraries.
-- No external copyrighted audio files.
 - Respect `prefers-reduced-motion: reduce`.
 - Maintain mobile-first responsive design.
 - Keep changes focused on `src/components/invite/envelope-opening.tsx`, `src/app/invite/[slug]/page.tsx`, `src/app/layout.tsx`, and `public/` assets.
@@ -18,125 +17,60 @@
 
 ---
 
-### Task 1: Generate the envelope sound WAV file
+### Task 1: Use supplied MP3 sound assets
 
 **Files:**
-- Create: `scripts/generate-envelope-sound.js`
-- Create: `public/sounds/envelope-open.wav`
+- Add to repo: `public/sounds/open-envelope.mp3`
+- Add to repo: `public/sounds/bg-music.mp3`
+- Delete: `public/sounds/envelope-open.wav`
+- Delete: `scripts/generate-envelope-sound.js`
 
 **Interfaces:**
-- Produces: `public/sounds/envelope-open.wav` (~1.5s, rustling noise + chime)
+- Consumes: user-supplied MP3 files.
+- Produces: cleaned-up assets folder, no generated WAV or generation script.
 
-- [ ] **Step 1: Create the generation script**
+- [x] **Step 1: Remove old generated sound asset and script**
 
-```js
-const fs = require("fs");
-const path = require("path");
+- [x] **Step 2: Verify the new MP3 files exist in `public/sounds/`**
 
-const SAMPLE_RATE = 44100;
-const BITS_PER_SAMPLE = 16;
-const BYTES_PER_SAMPLE = BITS_PER_SAMPLE / 8;
-const CHANNELS = 1;
+Expected: `public/sounds/open-envelope.mp3` and `public/sounds/bg-music.mp3` are present.
 
-function writeWav(filename, samples) {
-  const byteLength = samples.length * BYTES_PER_SAMPLE;
-  const buffer = Buffer.alloc(44 + byteLength);
-
-  buffer.write("RIFF", 0);
-  buffer.writeUInt32LE(36 + byteLength, 4);
-  buffer.write("WAVE", 8);
-  buffer.write("fmt ", 12);
-  buffer.writeUInt32LE(16, 16);
-  buffer.writeUInt16LE(1, 20); // PCM
-  buffer.writeUInt16LE(CHANNELS, 22);
-  buffer.writeUInt32LE(SAMPLE_RATE, 24);
-  buffer.writeUInt32LE(SAMPLE_RATE * CHANNELS * BYTES_PER_SAMPLE, 28);
-  buffer.writeUInt16LE(CHANNELS * BYTES_PER_SAMPLE, 32);
-  buffer.writeUInt16LE(BITS_PER_SAMPLE, 34);
-  buffer.write("data", 36);
-  buffer.writeUInt32LE(byteLength, 40);
-
-  for (let i = 0; i < samples.length; i++) {
-    const clamped = Math.max(-1, Math.min(1, samples[i]));
-    buffer.writeInt16LE(Math.round(clamped * 32767), 44 + i * BYTES_PER_SAMPLE);
-  }
-
-  fs.writeFileSync(filename, buffer);
-}
-
-function generateEnvelopeSound() {
-  const totalDuration = 1.0;
-  const totalSamples = Math.floor(SAMPLE_RATE * totalDuration);
-  const samples = new Float32Array(totalSamples).fill(0);
-
-  // Paper page-turn rustle: white noise shaped by a quick burst envelope
-  // and amplitude-modulated with slower noise for a crinkly texture.
-  const rustleDuration = 0.7;
-  const rustleSamples = Math.floor(SAMPLE_RATE * rustleDuration);
-
-  for (let i = 0; i < rustleSamples; i++) {
-    const t = i / SAMPLE_RATE;
-    const envelope = Math.min(1, t / 0.04) * Math.min(1, (rustleDuration - t) / 0.25);
-    const noise = Math.random() * 2 - 1;
-    const crinkle = 0.5 + 0.5 * Math.sin(i * 0.03) * Math.random();
-    const emphasized = noise * (0.6 + 0.4 * Math.sin(i * 0.15));
-    samples[i] += emphasized * crinkle * envelope * 0.55;
-  }
-
-  return samples;
-}
-
-const outputPath = path.join(__dirname, "..", "public", "sounds", "envelope-open.wav");
-fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-writeWav(outputPath, generateEnvelopeSound());
-console.log("Generated:", outputPath);
-```
-
-- [ ] **Step 2: Generate the file**
-
-Run: `node scripts/generate-envelope-sound.js`
-Expected: Console outputs `Generated: .../public/sounds/envelope-open.wav`
-
-- [ ] **Step 3: Verify the file exists and is reasonable size**
-
-Run: `ls -lh public/sounds/envelope-open.wav`
-Expected: File exists, size ~50-200 KB.
-
-- [ ] **Step 4: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
-git add scripts/generate-envelope-sound.js public/sounds/envelope-open.wav
-git commit -m "feat(invite): generate envelope opening sound asset"
+git rm public/sounds/envelope-open.wav scripts/generate-envelope-sound.js
+git add public/sounds/open-envelope.mp3 public/sounds/bg-music.mp3
+git commit -m "chore(invite): replace generated WAV with supplied MP3 assets"
 ```
 
 ---
 
-### Task 2: Make envelope opening user-initiated with audio
+### Task 2: Make envelope opening play open sound and looping background music
 
 **Files:**
 - Modify: `src/components/invite/envelope-opening.tsx`
 
 **Interfaces:**
-- Consumes: `/sounds/envelope-open.wav` from the public folder.
-- Produces: `EnvelopeOpening` component that waits for user interaction before opening and plays audio on open.
+- Consumes: `/sounds/open-envelope.mp3`, `/sounds/bg-music.mp3`.
+- Produces: `EnvelopeOpening` component that plays the open sound immediately and background music after a delay on user interaction.
 
-- [ ] **Step 1: Replace auto-start timers with user-initiated handlers**
+- [x] **Step 1: Update audio playback logic**
 
 In `src/components/invite/envelope-opening.tsx`:
-- Add a new phase `"ready"` before `"opening"`.
-- Remove the auto-start `setTimeout` chain from the initial `useEffect`.
-- Keep the `setTimeout` chain but trigger it only after the user clicks/taps.
-- Create an `<audio>` element via `useRef` pointing to `/sounds/envelope-open.wav`.
-- On user gesture, call `audioRef.current.play()` and start the animation.
-- Respect `prefers-reduced-motion` by jumping straight to `"done"`.
+- Replace the single `audioRef` with `openSoundRef` and `bgMusicRef`.
+- Preload both MP3 files on mount and set `bgMusicRef.current.loop = true`.
+- On user gesture, play `open-envelope.mp3` immediately.
+- Schedule `bg-music.mp3` to start after `BG_MUSIC_DELAY_MS` (default 2000 ms).
+- Swallow playback errors and continue animation silently.
+- Pause/reset both audio elements on unmount.
 
-- [ ] **Step 2: Add tap cue and keyboard accessibility**
+- [x] **Step 2: Keep user-initiated open and accessibility**
 
-- Wrap the envelope in a `<button>` or add `role="button"`, `tabIndex={0}`, and `aria-label="Open invitation"`.
-- Add a visible "Tap to open" cue (text + gentle pulse animation).
-- Support `Enter` and `Space` keys.
+- Envelope remains a `<button>` with `aria-label="Open invitation"`.
+- Keep keyboard support (`Enter` / `Space`).
+- Keep `prefers-reduced-motion` handling (jump to `"done"`, no audio).
 
-- [ ] **Step 3: Test the component behavior**
+- [x] **Step 3: Test the component behavior**
 
 Run: `npm run build`
 Expected: Build succeeds with no TypeScript errors.
@@ -144,11 +78,11 @@ Expected: Build succeeds with no TypeScript errors.
 Run: `npm run lint`
 Expected: No new lint errors in `envelope-opening.tsx`.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/components/invite/envelope-opening.tsx
-git commit -m "feat(invite): make envelope opening user-initiated with sound"
+git commit -m "feat(invite): play open sound and looping background music on envelope open"
 ```
 
 ---
@@ -162,18 +96,18 @@ git commit -m "feat(invite): make envelope opening user-initiated with sound"
 - Consumes: `EnvelopeOpening` phase completion via `onOpenComplete`.
 - Produces: First `StorybookPage` no longer relies on a hardcoded delay from page load.
 
-- [ ] **Step 1: Remove the hardcoded delay on the first storybook page**
+- [x] **Step 1: Remove the hardcoded delay on the first storybook page**
 
 In `src/app/invite/[slug]/page.tsx`:
 - Change `<StorybookPage delay={2400} ...>` to `<StorybookPage ...>` (default delay `0`).
 - This prevents the first page from revealing behind the envelope before the user opens it.
 
-- [ ] **Step 2: Build and verify**
+- [x] **Step 2: Build and verify**
 
 Run: `npm run build`
 Expected: Build succeeds.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add src/app/invite/[slug]/page.tsx
@@ -195,7 +129,7 @@ git commit -m "fix(invite): remove hardcoded storybook delay tied to auto-open"
 - Consumes: `public/app_logo.png`.
 - Produces: Properly sized favicon PNGs and updated metadata in `src/app/layout.tsx`.
 
-- [ ] **Step 1: Create the favicon generation script**
+- [x] **Step 1: Create the favicon generation script**
 
 Create `scripts/generate-favicons.js`:
 
@@ -229,12 +163,12 @@ generateFavicons().catch((err) => {
 });
 ```
 
-- [ ] **Step 2: Run the generation script**
+- [x] **Step 2: Run the generation script**
 
 Run: `node scripts/generate-favicons.js`
 Expected: Console outputs generated favicon files.
 
-- [ ] **Step 3: Update root metadata icons**
+- [x] **Step 3: Update root metadata icons**
 
 In `src/app/layout.tsx`, change the `metadata` export to include icons:
 
@@ -250,12 +184,12 @@ export const metadata: Metadata = {
 };
 ```
 
-- [ ] **Step 4: Build and verify**
+- [x] **Step 4: Build and verify**
 
 Run: `npm run build`
 Expected: Build succeeds.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add scripts/generate-favicons.js public/favicon-16x16.png public/favicon-32x32.png public/apple-touch-icon.png src/app/layout.tsx
@@ -269,27 +203,28 @@ git commit -m "fix: generate proper favicon sizes from app logo"
 **Files:**
 - All files above.
 
-- [ ] **Step 1: Run full build**
+- [x] **Step 1: Run full build**
 
 Run: `npm run build`
 Expected: Build succeeds.
 
-- [ ] **Step 2: Run linter**
+- [x] **Step 2: Run linter**
 
 Run: `npm run lint`
 Expected: No new errors. Pre-existing errors in `envelope-opening.tsx` and `floating-shapes.tsx` may remain unless also fixed.
 
-- [ ] **Step 3: Manual QA checklist**
+- [x] **Step 3: Manual QA checklist**
 
 - Visit `/invite/<valid-slug>`.
 - Confirm sealed envelope with "Tap to open" cue is visible.
 - Click/tap the envelope.
-- Confirm sound plays and animation runs.
-- Confirm invitation content appears after envelope fades.
-- Confirm browser tab shows `app_logo.png` instead of Vercel icon.
+- Confirm open sound plays immediately.
+- Confirm animation runs and invitation content appears after envelope fades.
+- Confirm background music starts after a short delay and loops.
+- Confirm browser tab shows app logo favicon instead of Vercel icon.
 - Test with `prefers-reduced-motion: reduce` (silent, instant reveal).
 
-- [ ] **Step 4: Final commit (if any integration tweaks were needed)**
+- [x] **Step 4: Final commit (if any integration tweaks were needed)**
 
 ```bash
 git add .
@@ -300,9 +235,10 @@ git commit -m "chore: final integration for envelope sound and favicon"
 
 - **Spec coverage:**
   - User-initiated envelope open → Task 2
-  - Rustle + chime sound → Task 1
+  - Open sound effect on open → Task 2
+  - Looping background music after delay → Task 2
   - Accessibility → Task 2
   - Reduced motion → Task 2
   - Favicon update → Task 4
 - **Placeholder scan:** No TBDs, TODOs, or vague steps.
-- **Type consistency:** Component props remain unchanged. Audio path is a string constant.
+- **Type consistency:** Component props remain unchanged. Audio paths are string constants.

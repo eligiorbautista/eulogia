@@ -9,16 +9,22 @@ interface EnvelopeOpeningProps {
   onOpenComplete?: () => void;
 }
 
+const BG_MUSIC_DELAY_MS = 2000;
+
 export function EnvelopeOpening({ gender, childName, onOpenComplete }: EnvelopeOpeningProps) {
   const [phase, setPhase] = useState<"ready" | "opening" | "revealing" | "done">("ready");
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const openSoundRef = useRef<HTMLAudioElement | null>(null);
+  const bgMusicRef = useRef<HTMLAudioElement | null>(null);
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   useEffect(() => {
-    audioRef.current = new Audio("/sounds/envelope-open.wav");
-    audioRef.current.preload = "auto";
-    audioRef.current.load();
+    openSoundRef.current = new Audio("/sounds/open-envelope.mp3");
+    openSoundRef.current.preload = "auto";
+
+    bgMusicRef.current = new Audio("/sounds/bg-music.mp3");
+    bgMusicRef.current.preload = "auto";
+    bgMusicRef.current.loop = true;
 
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     setPrefersReducedMotion(mediaQuery.matches);
@@ -30,6 +36,15 @@ export function EnvelopeOpening({ gender, childName, onOpenComplete }: EnvelopeO
     return () => {
       timersRef.current.forEach(clearTimeout);
       timersRef.current = [];
+
+      openSoundRef.current?.pause();
+      if (openSoundRef.current) openSoundRef.current.currentTime = 0;
+
+      bgMusicRef.current?.pause();
+      if (bgMusicRef.current) {
+        bgMusicRef.current.currentTime = 0;
+        bgMusicRef.current.loop = false;
+      }
     };
   }, [onOpenComplete]);
 
@@ -55,10 +70,20 @@ export function EnvelopeOpening({ gender, childName, onOpenComplete }: EnvelopeO
     if (phase !== "ready" || prefersReducedMotion) return;
 
     try {
-      await audioRef.current?.play();
+      await openSoundRef.current?.play();
     } catch {
       // Autoplay or playback failed; continue animation silently.
     }
+
+    timersRef.current.push(
+      setTimeout(async () => {
+        try {
+          await bgMusicRef.current?.play();
+        } catch {
+          // Background music playback failed; ignore.
+        }
+      }, BG_MUSIC_DELAY_MS)
+    );
 
     startAnimation();
   }, [phase, prefersReducedMotion, startAnimation]);
