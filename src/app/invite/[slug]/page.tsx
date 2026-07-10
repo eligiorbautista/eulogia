@@ -257,7 +257,9 @@ export default async function InvitePage({ params }: InvitePageProps) {
         </StorybookPage>
       </div>
 
-      <Footer />
+      <div className="mt-8 sm:mt-12">
+        <Footer />
+      </div>
     </div>
   );
 }
