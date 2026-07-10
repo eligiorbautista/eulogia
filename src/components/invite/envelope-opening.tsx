@@ -77,7 +77,7 @@ export function EnvelopeOpening({ gender, childName, onOpen, onOpenComplete }: E
       onClick={handleOpen}
       onKeyDown={handleKeyDown}
       aria-label="Open invitation"
-      className={`fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-background via-soft to-background px-6 transition-opacity duration-700 ${
+      className={`fixed inset-0 z-50 flex cursor-pointer flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-background via-soft to-background px-6 transition-opacity duration-700 ${
         isRevealing ? "pointer-events-none opacity-0" : "opacity-100"
       }`}
     >
