@@ -1,67 +1,71 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+} from "react";
 
-interface InvitationAudioProps {
-  play: boolean;
+export interface InvitationAudioHandle {
+  playOpen: () => Promise<void>;
+  playBackground: () => Promise<void>;
 }
 
-const BG_MUSIC_DELAY_MS = 2000;
+export const InvitationAudio = forwardRef<InvitationAudioHandle>(
+  function InvitationAudio(_props, ref) {
+    const openSoundRef = useRef<HTMLAudioElement | null>(null);
+    const bgMusicRef = useRef<HTMLAudioElement | null>(null);
 
-export function InvitationAudio({ play }: InvitationAudioProps) {
-  const openSoundRef = useRef<HTMLAudioElement | null>(null);
-  const bgMusicRef = useRef<HTMLAudioElement | null>(null);
-  const hasPlayedRef = useRef(false);
-  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+    useEffect(() => {
+      const openSound = new Audio("/sounds/open-envelope.mp3");
+      openSound.preload = "auto";
+      openSound.load();
+      openSoundRef.current = openSound;
 
-  useEffect(() => {
-    openSoundRef.current = new Audio("/sounds/open-envelope.mp3");
-    openSoundRef.current.preload = "auto";
-    openSoundRef.current.load();
+      const bgMusic = new Audio("/sounds/bg-music.mp3");
+      bgMusic.preload = "auto";
+      bgMusic.loop = true;
+      bgMusic.load();
+      bgMusicRef.current = bgMusic;
 
-    bgMusicRef.current = new Audio("/sounds/bg-music.mp3");
-    bgMusicRef.current.preload = "auto";
-    bgMusicRef.current.loop = true;
-    bgMusicRef.current.load();
+      return () => {
+        openSoundRef.current?.pause();
+        if (openSoundRef.current) {
+          openSoundRef.current.currentTime = 0;
+        }
 
-    return () => {
-      timersRef.current.forEach(clearTimeout);
-      timersRef.current = [];
+        bgMusicRef.current?.pause();
+        if (bgMusicRef.current) {
+          bgMusicRef.current.currentTime = 0;
+          bgMusicRef.current.loop = false;
+        }
+      };
+    }, []);
 
-      openSoundRef.current?.pause();
-      if (openSoundRef.current) openSoundRef.current.currentTime = 0;
+    useImperativeHandle(ref, () => ({
+      playOpen: async () => {
+        const audio = openSoundRef.current;
+        if (!audio) return;
+        try {
+          audio.currentTime = 0;
+          await audio.play();
+        } catch {
+          // iOS may block audio if not triggered directly by user gesture.
+        }
+      },
+      playBackground: async () => {
+        const audio = bgMusicRef.current;
+        if (!audio) return;
+        try {
+          audio.currentTime = 0;
+          await audio.play();
+        } catch {
+          // Ignore background music playback failures.
+        }
+      },
+    }));
 
-      bgMusicRef.current?.pause();
-      if (bgMusicRef.current) {
-        bgMusicRef.current.currentTime = 0;
-        bgMusicRef.current.loop = false;
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!play || hasPlayedRef.current) return;
-    hasPlayedRef.current = true;
-
-    const playOpen = async () => {
-      try {
-        await openSoundRef.current?.play();
-      } catch {
-        // Open sound playback failed; continue silently.
-      }
-    };
-
-    const playBg = async () => {
-      try {
-        await bgMusicRef.current?.play();
-      } catch {
-        // Background music playback failed; ignore.
-      }
-    };
-
-    playOpen();
-    timersRef.current.push(setTimeout(playBg, BG_MUSIC_DELAY_MS));
-  }, [play]);
-
-  return null;
-}
+    return null;
+  }
+);
