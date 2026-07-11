@@ -12,26 +12,34 @@ interface EnvelopeOpeningProps {
 
 export function EnvelopeOpening({ gender, childName, onOpen, onOpenComplete }: EnvelopeOpeningProps) {
   const [phase, setPhase] = useState<"ready" | "opening" | "revealing" | "done">("ready");
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const reducedMotionRef = useRef(false);
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setPrefersReducedMotion(mediaQuery.matches);
+    reducedMotionRef.current = mediaQuery.matches;
 
-    if (mediaQuery.matches) {
-      onOpenComplete?.();
-    }
+    const handleChange = (e: MediaQueryListEvent) => {
+      reducedMotionRef.current = e.matches;
+    };
+    mediaQuery.addEventListener("change", handleChange);
 
     return () => {
+      mediaQuery.removeEventListener("change", handleChange);
       timersRef.current.forEach(clearTimeout);
       timersRef.current = [];
     };
-  }, [onOpenComplete]);
+  }, []);
 
   const startAnimation = useCallback(() => {
     timersRef.current.forEach(clearTimeout);
     timersRef.current = [];
+
+    if (reducedMotionRef.current) {
+      setPhase("done");
+      onOpenComplete?.();
+      return;
+    }
 
     timersRef.current.push(
       setTimeout(() => setPhase("opening"), 600)
@@ -48,11 +56,11 @@ export function EnvelopeOpening({ gender, childName, onOpen, onOpenComplete }: E
   }, [onOpenComplete]);
 
   const handleOpen = useCallback(() => {
-    if (phase !== "ready" || prefersReducedMotion) return;
+    if (phase !== "ready") return;
 
     onOpen?.();
     startAnimation();
-  }, [phase, prefersReducedMotion, onOpen, startAnimation]);
+  }, [phase, onOpen, startAnimation]);
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLButtonElement>) => {
@@ -64,7 +72,7 @@ export function EnvelopeOpening({ gender, childName, onOpen, onOpenComplete }: E
     [handleOpen]
   );
 
-  if (prefersReducedMotion || phase === "done") {
+  if (phase === "done") {
     return null;
   }
 
