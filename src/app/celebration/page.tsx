@@ -5,7 +5,7 @@ import { StorybookPage } from "@/components/invite/storybook-page";
 import { FloatingShapes } from "@/components/invite/floating-shapes";
 import { SparkleDecoration } from "@/components/invite/sparkle-decoration";
 import { Footer } from "@/components/footer";
-import { formatDate, formatTime } from "@/lib/format";
+import { formatDate } from "@/lib/format";
 import {
   RattleIcon,
   BootiesIcon,
@@ -29,16 +29,11 @@ export default async function CelebrationPage() {
   const childName = details?.childName ?? "our baby";
   const gender = (details?.gender ?? "boy") as "boy" | "girl";
 
-  const whenText = [
-    details?.baptismDate ? formatDate(details.baptismDate) : null,
-    details?.baptismTime ? formatTime(details.baptismTime) : null,
-  ]
-    .filter(Boolean)
-    .join(" at ");
+  const dateText = details?.baptismDate ? formatDate(details.baptismDate) : null;
 
   const items = [
-    whenText
-      ? { icon: Calendar, label: "When", text: whenText, subtext: undefined }
+    dateText
+      ? { icon: Calendar, label: "When", text: dateText, subtext: undefined }
       : null,
     details?.receptionVenueName || details?.receptionVenueAddress
       ? {
@@ -46,14 +41,6 @@ export default async function CelebrationPage() {
           label: "Celebration",
           text: details.receptionVenueName,
           subtext: details.receptionVenueAddress,
-        }
-      : null,
-    details?.venueName || details?.venueAddress
-      ? {
-          icon: MapPin,
-          label: "Ceremony",
-          text: details.venueName,
-          subtext: details.venueAddress,
         }
       : null,
     details?.dressCode

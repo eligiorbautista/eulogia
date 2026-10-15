@@ -107,7 +107,7 @@ The app will be available at `http://localhost:3000`. The root path redirects to
 
 ## Public Celebration Page
 
-Share `/celebration` with friends and family who aren't godparents. It shows the baby's photo and name, the date, and the celebration venue (plus the ceremony venue and dress code when set). It has no RSVP form and no per-guest personalization.
+Share `/celebration` with friends and family who aren't godparents. It shows the baby's photo and name, the date, the celebration venue, and the dress code (when set). It has no RSVP form, no per-guest personalization, and no ceremony details (those are for godparents only).
 
 1. Set the event details in the admin (**Event Details**).
 2. Click **Copy celebration link** to copy the public URL.
