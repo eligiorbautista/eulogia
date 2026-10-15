@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CopyInviteUrl } from "./copy-invite-url";
+import { getResponseStatus } from "./response-status";
 import type { Guest, Response } from "@/db/schema";
 
 interface GuestsListProps {
@@ -16,6 +17,7 @@ export function GuestsList({ guests, responseByGuestId }: GuestsListProps) {
     <div className="space-y-3">
       {guests.map((guest) => {
         const response = responseByGuestId.get(guest.id);
+        const status = getResponseStatus(response);
         return (
           <Card key={guest.id}>
             <CardContent className="flex items-center justify-between gap-4 p-4">
@@ -25,13 +27,7 @@ export function GuestsList({ guests, responseByGuestId }: GuestsListProps) {
                   <Badge variant="secondary" className="capitalize">
                     {guest.role}
                   </Badge>
-                  {response ? (
-                    <Badge variant={response.canAttendBaptism ? "default" : "destructive"}>
-                      {response.canAttendBaptism ? "Attending" : "Not attending"}
-                    </Badge>
-                  ) : (
-                    <Badge variant="outline">No response</Badge>
-                  )}
+                  <Badge variant={status.variant}>{status.label}</Badge>
                 </div>
               </div>
               <div className="flex items-center gap-2">

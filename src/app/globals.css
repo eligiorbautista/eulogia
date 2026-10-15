@@ -460,23 +460,6 @@
   }
 }
 
-/* Print */
-@media print {
-  body * {
-    visibility: hidden !important;
-  }
-  .print-area,
-  .print-area * {
-    visibility: visible !important;
-  }
-  .print-area {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-  }
-}
-
 /* Small mobile utilities */
 @media (max-width: 359px) {
   .small-mobile\:p-3 { padding: 0.75rem; }

@@ -8,13 +8,12 @@ import {
 } from "@/components/invite/invitation-audio";
 
 interface InviteShellProps {
-  gender: "boy" | "girl";
   childName: string;
 }
 
 const BG_MUSIC_DELAY_MS = 2000;
 
-export function InviteShell({ gender, childName }: InviteShellProps) {
+export function InviteShell({ childName }: InviteShellProps) {
   const audioRef = useRef<InvitationAudioHandle>(null);
 
   const handleOpen = useCallback(() => {
@@ -31,7 +30,6 @@ export function InviteShell({ gender, childName }: InviteShellProps) {
     <>
       <InvitationAudio ref={audioRef} />
       <EnvelopeOpening
-        gender={gender}
         childName={childName}
         onOpen={handleOpen}
       />

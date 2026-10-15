@@ -117,7 +117,7 @@ export function EventDetailsForm({
           <hr className="border-border" />
 
           <div className="space-y-4">
-            <h3 className="text-sm font-medium text-muted-foreground">Location</h3>
+            <h3 className="text-sm font-medium text-muted-foreground">Ceremony</h3>
             <div className="space-y-2">
               <Label htmlFor="venueName">Venue Name</Label>
               <Input
@@ -134,6 +134,33 @@ export function EventDetailsForm({
                 name="venueAddress"
                 defaultValue={details?.venueAddress ?? ""}
                 placeholder="e.g. 123 Main St, Makati City"
+              />
+            </div>
+          </div>
+
+          <hr className="border-border" />
+
+          <div className="space-y-4">
+            <h3 className="text-sm font-medium text-muted-foreground">Celebration</h3>
+            <p className="text-xs text-muted-foreground">
+              Optional. Shown as a separate location for the reception after the baptism.
+            </p>
+            <div className="space-y-2">
+              <Label htmlFor="receptionVenueName">Venue Name</Label>
+              <Input
+                id="receptionVenueName"
+                name="receptionVenueName"
+                defaultValue={details?.receptionVenueName ?? ""}
+                placeholder="e.g. The Grand Ballroom"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="receptionVenueAddress">Venue Address</Label>
+              <Input
+                id="receptionVenueAddress"
+                name="receptionVenueAddress"
+                defaultValue={details?.receptionVenueAddress ?? ""}
+                placeholder="e.g. 456 Roxas Blvd, Pasay City"
               />
             </div>
           </div>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { db } from "@/db";
 import { DashboardStats } from "@/components/admin/dashboard-stats";
+import { getResponseStatus } from "@/components/admin/response-status";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -65,6 +66,7 @@ export default async function DashboardPage() {
             <ul className="divide-y">
               {recentGuests.map((guest) => {
                 const response = responseByGuestId.get(guest.id);
+                const status = getResponseStatus(response);
                 return (
                   <li
                     key={guest.id}
@@ -76,17 +78,7 @@ export default async function DashboardPage() {
                         <Badge variant="secondary" className="capitalize">
                           {guest.role}
                         </Badge>
-                        {response ? (
-                          <Badge
-                            variant={
-                              response.canAttendBaptism ? "default" : "destructive"
-                            }
-                          >
-                            {response.canAttendBaptism ? "Attending" : "Not attending"}
-                          </Badge>
-                        ) : (
-                          <Badge variant="outline">No response</Badge>
-                        )}
+                        <Badge variant={status.variant}>{status.label}</Badge>
                       </div>
                     </div>
                     <Button asChild variant="outline" size="sm">

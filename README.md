@@ -12,7 +12,7 @@ Built with **Next.js App Router**, **TypeScript**, **Tailwind CSS**, **shadcn/ui
 - RSVP form with three ordered questions
 - Admin dashboard with guest CRUD, copy invite URL, and statistics
 - Gender-based theme (blue for boy, pink for girl) controlled from admin dashboard
-- Print / PDF export page for responses and details
+- Separate ceremony and celebration (reception) venues shown on the invitation
 - Encrypted admin session cookie with bcrypt password hashing
 - Database seed/reset script that clears data without dropping tables
 - Reusable via seed data
@@ -53,6 +53,7 @@ SESSION_SECRET=change-me-to-a-long-random-string
 
 - `ADMIN_USERNAME` and `ADMIN_PASSWORD` default to `elidev` / `pwq123456`.
 - `SESSION_SECRET` should be a strong random string in production.
+- `NEXT_PUBLIC_SITE_URL` is the public origin used to build social share (Open Graph) links. It defaults to `http://localhost:3000`; set it to your deployed URL in production.
 
 ---
 
@@ -116,14 +117,6 @@ To also add sample guests, set `SEED_SAMPLE_GUESTS=true`:
 ```bash
 SEED_SAMPLE_GUESTS=true npm run db:seed
 ```
-
----
-
-## Print / PDF Export
-
-1. From the admin dashboard, click **Print / Export**.
-2. Review the summary and guest response table.
-3. Click **Print / Save as PDF** and use your browser's print dialog to save as PDF.
 
 ---
 

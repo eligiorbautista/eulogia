@@ -14,6 +14,7 @@ import type { Guest, Response } from "@/db/schema";
 interface RsvpFormProps {
   guest: Guest;
   existing?: Response;
+  gender: "boy" | "girl";
 }
 
 interface OptionProps {
@@ -54,7 +55,7 @@ function OptionCard({ id, value, label, description, checked }: OptionProps) {
   );
 }
 
-export function RsvpForm({ guest, existing }: RsvpFormProps) {
+export function RsvpForm({ guest, existing, gender }: RsvpFormProps) {
   const [state, formAction, isPending] = useActionState(
     submitRsvp.bind(null, guest.slug),
     {}
@@ -68,12 +69,13 @@ export function RsvpForm({ guest, existing }: RsvpFormProps) {
 
   useEffect(() => {
     if (state.success) {
-      launchConfetti({ gender: guest.role === "godfather" ? "boy" : "girl" });
+      // Confetti follows the child's theme, not the guest's role.
+      launchConfetti({ gender });
       toast.success("Response saved!", {
         description: "Thank you for your response.",
       });
     }
-  }, [state, guest.role]);
+  }, [state, gender]);
 
   const handleWillChange = (value: string) => {
     setWillValue(value);

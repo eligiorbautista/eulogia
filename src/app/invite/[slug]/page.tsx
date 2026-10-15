@@ -1,3 +1,4 @@
+import type { ComponentType } from "react";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { eq } from "drizzle-orm";
@@ -9,6 +10,7 @@ import { InviteShell } from "./invite-shell";
 import { StorybookPage } from "@/components/invite/storybook-page";
 import { Footer } from "@/components/footer";
 import { SparkleDecoration } from "@/components/invite/sparkle-decoration";
+import { formatDate, formatTime } from "@/lib/format";
 import {
   RattleIcon,
   BootiesIcon,
@@ -22,30 +24,17 @@ interface InvitePageProps {
   params: Promise<{ slug: string }>;
 }
 
-function formatDate(date?: string | null) {
-  if (!date) return null;
-  try {
-    return new Date(date).toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  } catch {
-    return date;
-  }
+interface EventItem {
+  icon: ComponentType<{ className?: string }>;
+  label: string;
+  text?: string | null;
+  subtext?: string | null;
 }
 
-function formatTime(time?: string | null) {
-  if (!time) return null;
-  try {
-    const [hours, minutes] = time.split(":").map(Number);
-    const period = hours >= 12 ? "PM" : "AM";
-    const displayHours = hours % 12 || 12;
-    return `${displayHours}:${String(minutes).padStart(2, "0")} ${period}`;
-  } catch {
-    return time;
-  }
+interface EventSection {
+  key: string;
+  title?: string;
+  items: EventItem[];
 }
 
 export default async function InvitePage({ params }: InvitePageProps) {
@@ -74,39 +63,56 @@ export default async function InvitePage({ params }: InvitePageProps) {
     .filter(Boolean)
     .join(" at ");
 
-  const eventItems = [
-    whenText
-      ? { icon: Calendar, label: "When", text: whenText }
-      : null,
-    details?.venueName || details?.venueAddress
-      ? {
-          icon: MapPin,
-          label: "Where",
-          text: details.venueName,
-          subtext: details.venueAddress,
-        }
-      : null,
-    details?.dressCode
-      ? { icon: Shirt, label: "What to Wear", text: details.dressCode }
-      : null,
-  ].filter(Boolean);
+  const ceremonyItems: EventItem[] = [];
+  if (whenText) {
+    ceremonyItems.push({ icon: Calendar, label: "When", text: whenText });
+  }
+  if (details?.venueName || details?.venueAddress) {
+    ceremonyItems.push({
+      icon: MapPin,
+      label: "Where",
+      text: details.venueName,
+      subtext: details.venueAddress,
+    });
+  }
 
-  const roleLabel =
-    guest.role === "godfather" ? "Godfather" : "Godmother";
+  const celebrationItems: EventItem[] = [];
+  if (details?.receptionVenueName || details?.receptionVenueAddress) {
+    celebrationItems.push({
+      icon: MapPin,
+      label: "Where",
+      text: details.receptionVenueName,
+      subtext: details.receptionVenueAddress,
+    });
+  }
+
+  const dressItems: EventItem[] = details?.dressCode
+    ? [{ icon: Shirt, label: "What to Wear", text: details.dressCode }]
+    : [];
+
+  const sections: EventSection[] = [
+    {
+      key: "ceremony",
+      title: celebrationItems.length > 0 ? "Ceremony" : undefined,
+      items: ceremonyItems,
+    },
+    { key: "celebration", title: "Celebration", items: celebrationItems },
+    { key: "dress", items: dressItems },
+  ].filter((section) => section.items.length > 0);
+
+  const roleLabel = guest.role === "godfather" ? "Godfather" : "Godmother";
 
   return (
     <div
       data-gender={gender}
       className="relative min-h-full overflow-hidden bg-gradient-to-b from-background via-soft/60 to-background px-4 py-8 sm:py-12"
     >
-      <InviteShell gender={gender} childName={childName} />
+      <InviteShell childName={childName} />
       <FloatingShapes gender={gender} />
 
       <div className="relative mx-auto max-w-xl sm:max-w-2xl lg:max-w-3xl">
         {/* Page 1 — Cover with Invitation & Blessings */}
-        <StorybookPage
-          className="mb-6 sm:mb-8"
-        >
+        <StorybookPage className="mb-6 sm:mb-8">
           <div className="text-center">
             <div className="relative mx-auto mb-6 h-44 w-44 sm:h-56 sm:w-56">
               {/* Soft outer glow */}
@@ -185,41 +191,52 @@ export default async function InvitePage({ params }: InvitePageProps) {
         </StorybookPage>
 
         {/* Page 2 — The Day */}
-        {eventItems.length > 0 && (
+        {sections.length > 0 && (
           <StorybookPage
             label="The Day"
             icon={RattleIcon}
             delay={2600}
             className="mb-6 sm:mb-8"
           >
-            <div className="space-y-4 text-left">
-              {eventItems.map((item, index) => {
-                if (!item) return null;
-                const Icon = item.icon;
-                return (
-                  <div
-                    key={index}
-                    className="group flex items-start gap-4 rounded-2xl bg-secondary/50 p-4 transition-all duration-200 hover:bg-secondary hover:shadow-sm"
-                  >
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-transform group-hover:scale-110">
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <div className="flex-1 pt-0.5">
-                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                        {item.label}
-                      </p>
-                      <p className="mt-0.5 text-base font-semibold text-foreground sm:text-lg">
-                        {item.text}
-                      </p>
-                      {item.subtext && (
-                        <p className="mt-0.5 text-sm text-muted-foreground sm:text-base">
-                          {item.subtext}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
+            <div className="space-y-6 text-left">
+              {sections.map((section) => (
+                <div key={section.key} className="space-y-4">
+                  {section.title && (
+                    <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+                      <span className="h-px w-6 bg-primary/30" />
+                      {section.title}
+                    </p>
+                  )}
+                  {section.items.map((item, index) => {
+                    const Icon = item.icon;
+                    return (
+                      <div
+                        key={`${section.key}-${index}`}
+                        className="group flex items-start gap-4 rounded-2xl bg-secondary/50 p-4 transition-all duration-200 hover:bg-secondary hover:shadow-sm"
+                      >
+                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-transform group-hover:scale-110">
+                          <Icon className="h-5 w-5" />
+                        </div>
+                        <div className="flex-1 pt-0.5">
+                          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                            {item.label}
+                          </p>
+                          {item.text && (
+                            <p className="mt-0.5 text-base font-semibold text-foreground sm:text-lg">
+                              {item.text}
+                            </p>
+                          )}
+                          {item.subtext && (
+                            <p className="mt-0.5 text-sm text-muted-foreground sm:text-base">
+                              {item.subtext}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
             </div>
           </StorybookPage>
         )}
@@ -242,7 +259,7 @@ export default async function InvitePage({ params }: InvitePageProps) {
                 </p>
               </div>
             )}
-            <RsvpForm guest={guest} existing={existing} />
+            <RsvpForm guest={guest} existing={existing} gender={gender} />
           </div>
         </StorybookPage>
 

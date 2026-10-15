@@ -18,6 +18,8 @@ export async function upsertEventDetails(
   const baptismTime = formData.get("baptismTime")?.toString();
   const venueName = formData.get("venueName")?.toString();
   const venueAddress = formData.get("venueAddress")?.toString();
+  const receptionVenueName = formData.get("receptionVenueName")?.toString();
+  const receptionVenueAddress = formData.get("receptionVenueAddress")?.toString();
   const dressCode = formData.get("dressCode")?.toString();
   const message = formData.get("message")?.toString();
 
@@ -41,6 +43,8 @@ export async function upsertEventDetails(
           baptismTime: baptismTime || null,
           venueName: venueName || null,
           venueAddress: venueAddress || null,
+          receptionVenueName: receptionVenueName || null,
+          receptionVenueAddress: receptionVenueAddress || null,
           dressCode: dressCode || null,
           message: message || null,
           updatedAt: now,
@@ -58,6 +62,8 @@ export async function upsertEventDetails(
         baptismTime: baptismTime || null,
         venueName: venueName || null,
         venueAddress: venueAddress || null,
+        receptionVenueName: receptionVenueName || null,
+        receptionVenueAddress: receptionVenueAddress || null,
         dressCode: dressCode || null,
         message: message || null,
         createdAt: now,

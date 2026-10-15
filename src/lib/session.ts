@@ -1,33 +1,40 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import crypto from "crypto";
+import {
+  createToken,
+  verifyToken,
+  type SessionPayload,
+} from "./session-token";
 
 const SESSION_COOKIE = "admin_session";
 const SESSION_EXPIRY_MS = 1000 * 60 * 60 * 24 * 7;
 
-export interface SessionPayload {
-  adminId: number;
-  expiresAt: number;
-}
+export type { SessionPayload };
 
 function getSecret(): string {
-  return process.env.SESSION_SECRET || "dev-secret-do-not-use-in-production";
-}
+  const secret = process.env.SESSION_SECRET;
+  if (secret) return secret;
 
-function sign(data: string, secret: string): string {
-  return crypto.createHmac("sha256", secret).update(data).digest("hex");
+  if (process.env.NODE_ENV === "production") {
+    console.warn(
+      "[session] SESSION_SECRET is not set. Falling back to an insecure development secret; set SESSION_SECRET in production."
+    );
+  }
+
+  return "dev-secret-do-not-use-in-production";
 }
 
 export async function createSession(adminId: number): Promise<void> {
-  const payload: SessionPayload = {
-    adminId,
-    expiresAt: Date.now() + SESSION_EXPIRY_MS,
-  };
-  const encoded = Buffer.from(JSON.stringify(payload)).toString("base64url");
-  const signature = sign(encoded, getSecret());
+  const token = createToken(
+    {
+      adminId,
+      expiresAt: Date.now() + SESSION_EXPIRY_MS,
+    },
+    getSecret()
+  );
 
   const cookieStore = await cookies();
-  cookieStore.set(SESSION_COOKIE, `${signature}.${encoded}`, {
+  cookieStore.set(SESSION_COOKIE, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
@@ -41,22 +48,7 @@ export async function getAdmin(): Promise<SessionPayload | null> {
   const cookie = cookieStore.get(SESSION_COOKIE)?.value;
   if (!cookie) return null;
 
-  const [signature, encoded] = cookie.split(".");
-  if (!signature || !encoded) return null;
-
-  const expected = sign(encoded, getSecret());
-  if (
-    !crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))
-  ) {
-    return null;
-  }
-
-  const payload = JSON.parse(
-    Buffer.from(encoded, "base64url").toString()
-  ) as SessionPayload;
-  if (Date.now() > payload.expiresAt) return null;
-
-  return payload;
+  return verifyToken(cookie, getSecret());
 }
 
 export async function requireAdmin(): Promise<SessionPayload> {

@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { CopyInviteUrl } from "./copy-invite-url";
+import { getResponseStatus } from "./response-status";
 import type { Guest, Response } from "@/db/schema";
 
 interface GuestsTableProps {
@@ -33,18 +34,13 @@ export function GuestsTable({ guests, responseByGuestId }: GuestsTableProps) {
         <TableBody>
           {guests.map((guest) => {
             const response = responseByGuestId.get(guest.id);
+            const status = getResponseStatus(response);
             return (
               <TableRow key={guest.id}>
                 <TableCell className="font-medium">{guest.name}</TableCell>
                 <TableCell className="capitalize">{guest.role}</TableCell>
                 <TableCell>
-                  {response ? (
-                    <Badge variant={response.canAttendBaptism ? "default" : "destructive"}>
-                      {response.canAttendBaptism ? "Attending" : "Not attending"}
-                    </Badge>
-                  ) : (
-                    <Badge variant="outline">No response</Badge>
-                  )}
+                  <Badge variant={status.variant}>{status.label}</Badge>
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex items-center justify-end gap-2">

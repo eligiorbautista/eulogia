@@ -1,11 +1,19 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -26,6 +34,8 @@ interface GuestFormProps {
 
 export function GuestForm({ guest, action, deleteAction }: GuestFormProps) {
   const [state, formAction, isPending] = useActionState(action, {});
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -45,16 +55,22 @@ export function GuestForm({ guest, action, deleteAction }: GuestFormProps) {
 
   const handleDelete = async () => {
     if (!deleteAction) return;
-    const result = await deleteAction();
-    if (result?.success) {
-      toast.success("Guest deleted!", {
-        description: `${guest?.name} has been removed.`,
-      });
-      setTimeout(() => router.push("/admin/guests"), 500);
-    } else if (result?.error) {
-      toast.error("Something went wrong", {
-        description: result.error,
-      });
+    setIsDeleting(true);
+    try {
+      const result = await deleteAction();
+      if (result?.success) {
+        setConfirmOpen(false);
+        toast.success("Guest deleted!", {
+          description: `${guest?.name} has been removed.`,
+        });
+        setTimeout(() => router.push("/admin/guests"), 500);
+      } else if (result?.error) {
+        toast.error("Something went wrong", {
+          description: result.error,
+        });
+      }
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -97,13 +113,45 @@ export function GuestForm({ guest, action, deleteAction }: GuestFormProps) {
           <Button
             type="button"
             variant="destructive"
-            onClick={handleDelete}
+            onClick={() => setConfirmOpen(true)}
             disabled={isPending}
           >
             Delete Guest
           </Button>
         )}
       </div>
+
+      {guest && deleteAction && (
+        <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Delete guest?</DialogTitle>
+              <DialogDescription>
+                This permanently removes {guest.name} and any response they
+                have submitted. This action cannot be undone.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setConfirmOpen(false)}
+                disabled={isDeleting}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={handleDelete}
+                disabled={isDeleting}
+              >
+                {isDeleting ? "Deleting..." : "Delete guest"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </form>
   );
 }

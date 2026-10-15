@@ -4,13 +4,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Heart } from "lucide-react";
 
 interface EnvelopeOpeningProps {
-  gender: "boy" | "girl";
   childName?: string;
   onOpen?: () => void;
   onOpenComplete?: () => void;
 }
 
-export function EnvelopeOpening({ gender, childName, onOpen, onOpenComplete }: EnvelopeOpeningProps) {
+export function EnvelopeOpening({ childName, onOpen, onOpenComplete }: EnvelopeOpeningProps) {
   const [phase, setPhase] = useState<"ready" | "opening" | "revealing" | "done">("ready");
   const reducedMotionRef = useRef(false);
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
