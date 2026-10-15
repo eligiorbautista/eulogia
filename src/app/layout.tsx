@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     description: "You are lovingly invited to our child's baptism.",
     images: [
       {
-        url: "/images/leo.png",
+        url: "/images/leo_new.JPG",
         alt: "Baptism invitation",
       },
     ],
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Eulogia | Baptism Invitation",
     description: "You are lovingly invited to our child's baptism.",
-    images: ["/images/leo.png"],
+    images: ["/images/leo_new.JPG"],
   },
 };
 

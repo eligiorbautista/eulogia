@@ -75,5 +75,6 @@ export async function upsertEventDetails(
   revalidatePath("/admin/dashboard");
   revalidatePath("/admin/event-details");
   revalidatePath("/invite/[slug]", "page");
+  revalidatePath("/celebration");
   return { success: true };
 }

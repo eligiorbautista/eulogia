@@ -9,6 +9,7 @@ Built with **Next.js App Router**, **TypeScript**, **Tailwind CSS**, **shadcn/ui
 ## Features
 
 - Personalized public invite pages at `/invite/[slug]`
+- Public celebration page at `/celebration` for guests who aren't godparents
 - RSVP form with three ordered questions
 - Admin dashboard with guest CRUD, copy invite URL, and statistics
 - Gender-based theme (blue for boy, pink for girl) controlled from admin dashboard
@@ -24,7 +25,7 @@ Built with **Next.js App Router**, **TypeScript**, **Tailwind CSS**, **shadcn/ui
 - Node.js 20+
 - npm
 - A [Turso](https://turso.tech) database
-- A transparent baby photo saved as `public/baby.png`
+- A baby photo saved as `public/images/leo_new.JPG`
 
 ---
 
@@ -78,10 +79,10 @@ npm run db:migrate
 npm run db:seed
 ```
 
-5. Place your baby's transparent photo at:
+5. Place your baby's photo at:
 
 ```
-public/baby.png
+public/images/leo_new.JPG
 ```
 
 6. Start the dev server:
@@ -101,6 +102,16 @@ The app will be available at `http://localhost:3000`. The root path redirects to
 3. Enter the guest's name and select their role (Godfather or Godmother).
 4. A unique slug is generated automatically.
 5. Click the clipboard icon next to the guest to copy their unique invite URL.
+
+---
+
+## Public Celebration Page
+
+Share `/celebration` with friends and family who aren't godparents. It shows the baby's photo and name, the date, and the celebration venue (plus the ceremony venue and dress code when set). It has no RSVP form and no per-guest personalization.
+
+1. Set the event details in the admin (**Event Details**).
+2. Click **Copy celebration link** to copy the public URL.
+3. Share it with your guests.
 
 ---
 
@@ -139,7 +150,7 @@ src/
   db/               # Drizzle schema, client, and seed script
   lib/              # Utilities (auth, session, slug helpers)
 public/
-  baby.png          # Baby photo with transparent background
+  images/leo_new.JPG   # Baby photo
 ```
 
 ---

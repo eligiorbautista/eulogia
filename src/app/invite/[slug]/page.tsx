@@ -123,7 +123,7 @@ export default async function InvitePage({ params }: InvitePageProps) {
               <div className="relative h-full w-full overflow-hidden rounded-full border-4 border-white bg-white shadow-xl">
                 <SparkleDecoration />
                 <Image
-                  src="/images/leo.png"
+                  src="/images/leo_new.JPG"
                   alt={childName}
                   fill
                   sizes="(max-width: 640px) 176px, 224px"
