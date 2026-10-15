@@ -146,6 +146,15 @@ export function EventDetailsForm({
               Optional. Shown as a separate location for the reception after the baptism.
             </p>
             <div className="space-y-2">
+              <Label htmlFor="receptionTime">Time</Label>
+              <Input
+                id="receptionTime"
+                name="receptionTime"
+                type="time"
+                defaultValue={details?.receptionTime ?? ""}
+              />
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="receptionVenueName">Venue Name</Label>
               <Input
                 id="receptionVenueName"

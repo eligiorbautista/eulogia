@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { db } from "@/db";
 import { StorybookPage } from "@/components/invite/storybook-page";
+import { InviteShell } from "@/components/invite/invite-shell";
 import { FloatingShapes } from "@/components/invite/floating-shapes";
 import { SparkleDecoration } from "@/components/invite/sparkle-decoration";
 import { Footer } from "@/components/footer";
-import { formatDate } from "@/lib/format";
+import { formatDate, formatTime } from "@/lib/format";
 import {
   RattleIcon,
   BootiesIcon,
@@ -29,11 +30,16 @@ export default async function CelebrationPage() {
   const childName = details?.childName ?? "our baby";
   const gender = (details?.gender ?? "boy") as "boy" | "girl";
 
-  const dateText = details?.baptismDate ? formatDate(details.baptismDate) : null;
+  const whenText = [
+    details?.baptismDate ? formatDate(details.baptismDate) : null,
+    details?.receptionTime ? formatTime(details.receptionTime) : null,
+  ]
+    .filter(Boolean)
+    .join(" at ");
 
   const items = [
-    dateText
-      ? { icon: Calendar, label: "When", text: dateText, subtext: undefined }
+    whenText
+      ? { icon: Calendar, label: "When", text: whenText, subtext: undefined }
       : null,
     details?.receptionVenueName || details?.receptionVenueAddress
       ? {
@@ -53,6 +59,7 @@ export default async function CelebrationPage() {
       data-gender={gender}
       className="relative min-h-full overflow-hidden bg-gradient-to-b from-background via-soft/60 to-background px-4 py-8 sm:py-12"
     >
+      <InviteShell childName={childName} subtitle="Celebration Invitation" />
       <FloatingShapes gender={gender} />
 
       <div className="relative mx-auto max-w-xl sm:max-w-2xl lg:max-w-3xl">

@@ -5,11 +5,17 @@ import { Heart } from "lucide-react";
 
 interface EnvelopeOpeningProps {
   childName?: string;
+  subtitle?: string;
   onOpen?: () => void;
   onOpenComplete?: () => void;
 }
 
-export function EnvelopeOpening({ childName, onOpen, onOpenComplete }: EnvelopeOpeningProps) {
+export function EnvelopeOpening({
+  childName,
+  subtitle = "Baptismal Invitation",
+  onOpen,
+  onOpenComplete,
+}: EnvelopeOpeningProps) {
   const [phase, setPhase] = useState<"ready" | "opening" | "revealing" | "done">("ready");
   const reducedMotionRef = useRef(false);
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -106,7 +112,7 @@ export function EnvelopeOpening({ childName, onOpen, onOpenComplete }: EnvelopeO
             {childName ?? "Invitation"}
           </p>
           <p className="mt-0.5 text-[0.6rem] font-medium uppercase tracking-[0.2em] text-muted-foreground">
-            Baptismal Invitation
+            {subtitle}
           </p>
         </div>
 

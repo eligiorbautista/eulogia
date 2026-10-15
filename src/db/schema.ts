@@ -22,6 +22,7 @@ export const eventDetails = sqliteTable("event_details", {
   venueAddress: text("venue_address"),
   receptionVenueName: text("reception_venue_name"),
   receptionVenueAddress: text("reception_venue_address"),
+  receptionTime: text("reception_time"),
   dressCode: text("dress_code"),
   message: text("message"),
   createdAt: integer("created_at")

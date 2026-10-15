@@ -9,11 +9,12 @@ import {
 
 interface InviteShellProps {
   childName: string;
+  subtitle?: string;
 }
 
 const BG_MUSIC_DELAY_MS = 2000;
 
-export function InviteShell({ childName }: InviteShellProps) {
+export function InviteShell({ childName, subtitle }: InviteShellProps) {
   const audioRef = useRef<InvitationAudioHandle>(null);
 
   const handleOpen = useCallback(() => {
@@ -31,6 +32,7 @@ export function InviteShell({ childName }: InviteShellProps) {
       <InvitationAudio ref={audioRef} />
       <EnvelopeOpening
         childName={childName}
+        subtitle={subtitle}
         onOpen={handleOpen}
       />
     </>

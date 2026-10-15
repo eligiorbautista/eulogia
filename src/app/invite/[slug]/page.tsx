@@ -6,7 +6,7 @@ import { db } from "@/db";
 import { guests, responses } from "@/db/schema";
 import { RsvpForm } from "@/components/invite/rsvp-form";
 import { FloatingShapes } from "@/components/invite/floating-shapes";
-import { InviteShell } from "./invite-shell";
+import { InviteShell } from "@/components/invite/invite-shell";
 import { StorybookPage } from "@/components/invite/storybook-page";
 import { Footer } from "@/components/footer";
 import { SparkleDecoration } from "@/components/invite/sparkle-decoration";
@@ -77,6 +77,13 @@ export default async function InvitePage({ params }: InvitePageProps) {
   }
 
   const celebrationItems: EventItem[] = [];
+  if (details?.receptionTime) {
+    celebrationItems.push({
+      icon: Calendar,
+      label: "When",
+      text: formatTime(details.receptionTime),
+    });
+  }
   if (details?.receptionVenueName || details?.receptionVenueAddress) {
     celebrationItems.push({
       icon: MapPin,

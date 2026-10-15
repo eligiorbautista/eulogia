@@ -20,6 +20,7 @@ export async function upsertEventDetails(
   const venueAddress = formData.get("venueAddress")?.toString();
   const receptionVenueName = formData.get("receptionVenueName")?.toString();
   const receptionVenueAddress = formData.get("receptionVenueAddress")?.toString();
+  const receptionTime = formData.get("receptionTime")?.toString();
   const dressCode = formData.get("dressCode")?.toString();
   const message = formData.get("message")?.toString();
 
@@ -45,6 +46,7 @@ export async function upsertEventDetails(
           venueAddress: venueAddress || null,
           receptionVenueName: receptionVenueName || null,
           receptionVenueAddress: receptionVenueAddress || null,
+          receptionTime: receptionTime || null,
           dressCode: dressCode || null,
           message: message || null,
           updatedAt: now,
@@ -64,6 +66,7 @@ export async function upsertEventDetails(
         venueAddress: venueAddress || null,
         receptionVenueName: receptionVenueName || null,
         receptionVenueAddress: receptionVenueAddress || null,
+        receptionTime: receptionTime || null,
         dressCode: dressCode || null,
         message: message || null,
         createdAt: now,
