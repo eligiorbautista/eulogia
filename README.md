@@ -53,7 +53,7 @@ SESSION_SECRET=change-me-to-a-long-random-string
 
 - `ADMIN_USERNAME` and `ADMIN_PASSWORD` default to `elidev` / `pwq123456`.
 - `SESSION_SECRET` should be a strong random string in production.
-- `NEXT_PUBLIC_SITE_URL` is the public origin used to build social share (Open Graph) links. It defaults to `http://localhost:3000`; set it to your deployed URL in production.
+- `SITE_URL` is the public origin used to build social share (Open Graph) links. It defaults to `http://localhost:3000`; set it to your deployed URL in production. This is a server-side variable, so it deliberately has no `NEXT_PUBLIC_` prefix.
 
 ---
 

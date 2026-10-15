@@ -22,7 +22,7 @@ const playfair = Playfair_Display({
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
+    process.env.SITE_URL ?? "http://localhost:3000"
   ),
   title: "Eulogia | Baptism Invitation",
   description: "You are lovingly invited to our child's baptism.",
