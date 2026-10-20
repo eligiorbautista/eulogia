@@ -34,7 +34,7 @@ export function GuestsTable({ guests, responseByGuestId }: GuestsTableProps) {
         <TableBody>
           {guests.map((guest) => {
             const response = responseByGuestId.get(guest.id);
-            const status = getResponseStatus(response);
+            const status = getResponseStatus(response, guest.role);
             return (
               <TableRow key={guest.id}>
                 <TableCell className="font-medium">{guest.name}</TableCell>

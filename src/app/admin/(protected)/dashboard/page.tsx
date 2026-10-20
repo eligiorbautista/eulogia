@@ -66,7 +66,7 @@ export default async function DashboardPage() {
             <ul className="divide-y">
               {recentGuests.map((guest) => {
                 const response = responseByGuestId.get(guest.id);
-                const status = getResponseStatus(response);
+                const status = getResponseStatus(response, guest.role);
                 return (
                   <li
                     key={guest.id}

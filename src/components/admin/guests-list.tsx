@@ -17,7 +17,7 @@ export function GuestsList({ guests, responseByGuestId }: GuestsListProps) {
     <div className="space-y-3">
       {guests.map((guest) => {
         const response = responseByGuestId.get(guest.id);
-        const status = getResponseStatus(response);
+        const status = getResponseStatus(response, guest.role);
         return (
           <Card key={guest.id}>
             <CardContent className="flex items-center justify-between gap-4 p-4">

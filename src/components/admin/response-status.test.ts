@@ -18,7 +18,7 @@ function makeResponse(overrides: Partial<Response> = {}): Response {
 }
 
 test("reports no response when the guest has not answered", () => {
-  assert.deepEqual(getResponseStatus(undefined), {
+  assert.deepEqual(getResponseStatus(undefined, "godfather"), {
     label: "No response",
     variant: "outline",
   });
@@ -26,21 +26,30 @@ test("reports no response when the guest has not answered", () => {
 
 test("reports declined when the guest declined the role", () => {
   assert.deepEqual(
-    getResponseStatus(makeResponse({ willBeGodparent: false, canAttendBaptism: false })),
-    { label: "Declined", variant: "secondary" }
+    getResponseStatus(
+      makeResponse({ willBeGodparent: false, canAttendBaptism: false }),
+      "godfather"
+    ),
+    { label: "Declined role", variant: "secondary" }
   );
 });
 
-test("reports attending when the guest accepted and can attend", () => {
+test("names the accepted role when the guest accepts and can attend", () => {
   assert.deepEqual(
-    getResponseStatus(makeResponse({ willBeGodparent: true, canAttendBaptism: true })),
-    { label: "Attending", variant: "default" }
+    getResponseStatus(
+      makeResponse({ willBeGodparent: true, canAttendBaptism: true }),
+      "godfather"
+    ),
+    { label: "Accepted as Godfather · Attending", variant: "default" }
   );
 });
 
-test("reports not attending when the guest accepted but cannot attend", () => {
+test("names the accepted role when the guest accepts but cannot attend", () => {
   assert.deepEqual(
-    getResponseStatus(makeResponse({ willBeGodparent: true, canAttendBaptism: false })),
-    { label: "Not attending", variant: "destructive" }
+    getResponseStatus(
+      makeResponse({ willBeGodparent: true, canAttendBaptism: false }),
+      "godmother"
+    ),
+    { label: "Accepted as Godmother · Not attending", variant: "destructive" }
   );
 });
