@@ -26,11 +26,6 @@ export const metadata: Metadata = {
   ),
   title: "Eulogia | Baptism Invitation",
   description: "You are lovingly invited to our child's baptism.",
-  icons: {
-    icon: "/icons/favicon-32x32.png",
-    shortcut: "/icons/favicon-16x16.png",
-    apple: "/icons/apple-touch-icon.png",
-  },
   openGraph: {
     type: "website",
     siteName: "Eulogia",
